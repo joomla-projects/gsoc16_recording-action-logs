@@ -184,7 +184,7 @@ class PlgSystemUserLogs extends JPlugin
     {
         $isNew_string = $isnew ? 'true' : 'false';
         $success_string = $success ? 'true' : 'false';
-        $message = '{"edited_user":"'.$user->name.'","event":"onUserAfterSave",'.
+        $message = '{"edited_user":"'.$user["name"].'","event":"onUserAfterSave",'.
                     '"isNew":"'.$isNew_string.'","success":"'.$success_string.'"}';
 
         $jinput = JFactory::getApplication()->input;
@@ -206,7 +206,7 @@ class PlgSystemUserLogs extends JPlugin
      public function onUserAfterDelete($user, $success, $msg)
      {
          $success_string = $success ? 'true' : 'false';
-         $message = '{"edited_user":"'.$user->name.'","event":"onUserAfterSave",'.
+         $message = '{"edited_user":"'.$user["name"].'","event":"onUserAfterSave",'.
                      '"success":"'.$success_string.'"}';
          $jinput = JFactory::getApplication()->input;
          $context = $jinput->get('option');
