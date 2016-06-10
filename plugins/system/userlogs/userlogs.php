@@ -103,4 +103,134 @@ class PlgSystemUserLogs extends JPlugin
         $strContext = (string)$context;
         $this->addLogsToDB($message, $strContext);
     }
+
+    /**
+	 * On installing extensions logging method
+	 * This method adds a record to #__user_logs contains (message, date, context, user)
+	 * Method is called when an extension is installed
+	 *
+     * @param   JInstaller  $installer  Installer object
+	 * @param   integer     $eid        Extension Identifier
+	 *
+	 * @return  void
+	 *
+	 * @since   3.7
+	 */
+    public function onExtensionAfterInstall($installer, $eid)
+    {
+        $message = '{"event":"onExtensionAfterInstall","extenstion_id":'.(string)$eid.'}';
+        $jinput = JFactory::getApplication()->input;
+        $context = $jinput->get('option');
+        $this->addLogsToDB($message, $context);
+    }
+
+    /**
+	 * On uninstalling extensions logging method
+	 * This method adds a record to #__user_logs contains (message, date, context, user)
+	 * Method is called when an extension is uninstalled
+	 *
+     * @param   JInstaller  $installer  Installer instance
+	 * @param   integer     $eid        Extension id
+	 * @param   integer     $result     Installation result
+	 *
+	 * @return  void
+	 *
+	 * @since   3.7
+	 */
+    public function onExtensionAfterUninstall($installer, $eid, $result)
+    {
+        $message = '{"event":"onExtensionAfterUninstall","extenstion_id":'.(string)$eid.'}';
+        $jinput = JFactory::getApplication()->input;
+        $context = $jinput->get('option');
+        $this->addLogsToDB($message, $context);
+    }
+
+    /**
+     * On updating extensions logging method
+     * This method adds a record to #__user_logs contains (message, date, context, user)
+     * Method is called when an extension is updated
+     *
+     * @param   JInstaller  $installer  Installer instance
+     * @param   integer     $eid        Extension id
+     *
+     * @return  void
+     *
+     * @since   3.7
+     */
+    public function onExtensionAfterUpdate($installer, $eid)
+    {
+        $message = '{"event":"onExtensionAfterUpdate","extenstion_id":'.(string)$eid.'}';
+        $jinput = JFactory::getApplication()->input;
+        $context = $jinput->get('option');
+        $this->addLogsToDB($message, $context);
+    }
+
+    /**
+	 * On saving user data logging method
+	 *
+	 * Method is called after user data is stored in the database.
+     * This method logs who created/edited any user's data
+	 *
+	 * @param   array    $user     Holds the new user data.
+	 * @param   boolean  $isnew    True if a new user is stored.
+	 * @param   boolean  $success  True if user was succesfully stored in the database.
+	 * @param   string   $msg      Message.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.7
+	 */
+	public function onUserAfterSave($user, $isnew, $success, $msg)
+    {
+        $isNew_string = $isnew ? 'true' : 'false';
+        $success_string = $success ? 'true' : 'false';
+        $message = '{"edited_user":"'.$user->name.'","event":"onUserAfterSave",'.
+                    '"isNew":"'.$isNew_string.'","success":"'.$success_string.'"}';
+
+        $jinput = JFactory::getApplication()->input;
+        $context = $jinput->get('option');
+        $this->addLogsToDB($message, $context);
+    }
+
+    /**
+     * On deleting user data logging method
+     *
+     * Method is called after user data is deleted from the database
+     *
+     * @param   array    $user     Holds the user data
+     * @param   boolean  $success  True if user was succesfully stored in the database
+     * @param   string   $msg      Message
+     *
+     * @return  boolean
+     */
+     public function onUserAfterDelete($user, $success, $msg)
+     {
+         $success_string = $success ? 'true' : 'false';
+         $message = '{"edited_user":"'.$user->name.'","event":"onUserAfterSave",'.
+                     '"success":"'.$success_string.'"}';
+         $jinput = JFactory::getApplication()->input;
+         $context = $jinput->get('option');
+         $this->addLogsToDB($message, $context);
+     }
+
+     /**
+      * On deleting user group data logging method
+      *
+      * Method is called after user data is deleted from the database
+      *
+      * @param   array    $group     Holds the group data
+      * @param   boolean  $success  True if user was succesfully stored in the database
+      * @param   string   $msg      Message
+      *
+      * @return  boolean
+      */
+      public function onUserAfterDeleteGroup($group, $success, $msg)
+      {
+          $success_string = $success ? 'true' : 'false';
+          $message = '{"deleted_group":"'.$group["title"].'","event":"onUserAfterDeleteGroup",'.
+                      '"success":"'.$success_string.'"}';
+          $jinput = JFactory::getApplication()->input;
+          $context = $jinput->get('option');
+          $this->addLogsToDB($message, $context);
+      }
 }
