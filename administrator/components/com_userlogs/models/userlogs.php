@@ -52,6 +52,8 @@ class UserlogsModelUserlogs extends JModelList
 
     protected function getListQuery()
     {
+        $this->checkIn();
+
         $db    = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('a.*');
@@ -87,4 +89,19 @@ class UserlogsModelUserlogs extends JModelList
         return $query;
     }
 
+    protected function checkIn()
+    {
+        $plugin = JPluginHelper::getPlugin('system', 'userlogs');
+        $pluginParams = new JRegistry($plugin->params);
+        $daysToDeleteAfter = (int)$pluginParams->get('logDeletePeriod');
+
+        if ($daysToDeleteAfter > 0) {
+            $db = JFactory::getDbo(); $query = $db->getQuery(true);
+            $conditions = array( $db->quoteName('log_date') .' < DATE_SUB(NOW(), INTERVAL '. $daysToDeleteAfter .' DAY)');
+            $query->delete($db->quoteName('#__user_logs'));
+            $query->where($conditions);
+            $db->setQuery($query);
+            $result = $db->execute();
+        }
+    }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension version="3.6" type="plugin" group="system" method="upgrade">
-    <name>plg_system_userlogs</name>
+    <name>PLG_SYSTEM_USERLOGS</name>
     <author>Joomla! Project</author>
     <creationDate>May 2016</creationDate>
     <copyright>Copyright (C) 2005 - 2016 Open Source Matters. All rights reserved.</copyright>
@@ -9,6 +9,20 @@
 	<authorUrl>www.joomla.org</authorUrl>
 	<version>1.0.0</version>
     <description>PLG_SYSTEM_USERLOGS_XML_DESCRIPTION</description>
+    <config>
+		<fields name="params">
+			<fieldset name="basic">
+                <field
+                    name="logDeletePeriod"
+                    type="number"
+                    default="0"
+                    label="PLG_SYSTEM_USERLOGS_LOG_DELETE_PERIOD"
+                    description="PLG_SYSTEM_USERLOGS_LOG_DELETE_PERIOD_DESC"
+                    >
+                </field>
+			</fieldset>
+		</fields>
+	</config>
     <files>
         <folder>sql</folder>
         <filename plugin="userlogs">userlogs.php</filename>
@@ -29,8 +43,8 @@
         </sql>
     </uninstall>
     <update>
-        <sql>
-            <file driver="mysql" charset="utf8">sql/update.mysql.utf8.sql</file>
-        </sql>
+    	<schemas>
+    		<schemapath type="mysql">sql/updates/mysql</schemapath>
+    	</schemas>
     </update>
 </extension>
