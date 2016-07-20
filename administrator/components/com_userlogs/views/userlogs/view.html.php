@@ -24,6 +24,8 @@ class UserlogsViewUserlogs extends JViewLegacy
 	protected $items;
 
     protected $state;
+
+    public $activeFilters;
     /**
      * Method to display the view.
      *
@@ -39,6 +41,7 @@ class UserlogsViewUserlogs extends JViewLegacy
         $this->state     = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+
         if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
@@ -58,23 +61,5 @@ class UserlogsViewUserlogs extends JViewLegacy
     protected function addToolbar()
     {
         JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
-    }
-
-    /**
-     * Returns an array of fields the table can be sorted by
-     *
-     * @return  array  Array containing the field name to sort by as the key and display text as value
-     *
-     * @since   3.6
-     */
-    protected function getSortFields()
-    {
-        return array(
-            'a.message' => JText::_('JSTATUS'),
-            'a.user_id' => JText::_('COM_BANNERS_HEADING_NAME'),
-            'a.log_date' => JText::_('COM_BANNERS_HEADING_STICKY'),
-            'a.extension' => JText::_('JGRID_HEADING_LANGUAGE'),
-            'a.id' => JText::_('JGRID_HEADING_ID')
-        );
     }
 }
