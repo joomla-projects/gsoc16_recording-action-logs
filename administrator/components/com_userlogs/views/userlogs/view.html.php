@@ -46,6 +46,7 @@ class UserlogsViewUserlogs extends JViewLegacy
         $this->state     = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+        $pagination = $this->get('Pagination');
 
         if (count($errors = $this->get('Errors')))
 		{
@@ -67,4 +68,24 @@ class UserlogsViewUserlogs extends JViewLegacy
     {
         JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
     }
+
+    /**
+     * Change the retrived extension name to more user friendly name
+     *
+     * @param   string  $extension  Extension name
+     *
+     * @return  string  Translated extension name
+     *
+     * @since   3.6
+     */
+    protected function translateExtensionName($extension)
+    {
+        $lang = JFactory::getLanguage();
+        $source = JPATH_ADMINISTRATOR . '/components/' . $extension;
+
+        $lang->load("$extension.sys", JPATH_ADMINISTRATOR, null, false, true)
+         ||	$lang->load("$extension.sys", $source, null, false, true);
+
+        return JText::_($extension);
+     }
 }

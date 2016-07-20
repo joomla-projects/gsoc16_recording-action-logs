@@ -67,7 +67,7 @@ JHtml::_('formbehavior.chosen', 'select');
                             <?php echo $this->escape($item->log_date); ?>
                         </td>
                         <td>
-                            <?php echo $this->escape($item->extension); ?>
+                            <?php echo $this->translateExtensionName(strtoupper(strtok($this->escape($item->extension), '.'))); ?>
                         </td>
                         <td>
                             <?php echo JUser::getInstance($item->user_id)->name; ?>
