@@ -16,6 +16,12 @@ defined('_JEXEC') or die;
  */
 class PlgSystemUserLogs extends JPlugin
 {
+    protected $log_events = array();
+    public function __construct(&$subject, $config)
+	{
+		parent::__construct($subject, $config);
+        $this->log_events = $this->params->get('log_events');
+    }
     /**
 	 * Function to add logs to the database
 	 * This method adds a record to #__user_logs contains (message, date, context, user)
@@ -58,10 +64,13 @@ class PlgSystemUserLogs extends JPlugin
 	 */
     public function onContentAfterSave($context, $article, $isNew)
     {
-        $isNew_string = $isNew ? 'true' : 'false';
-        $message = '{"title":"'.$article->title.'","isNew":"'.$isNew_string.'", "event":"onContentAfterSave"}';
-        $strContext = (string)$context;
-        $this->addLogsToDB($message, $strContext);
+        if(in_array("onContentAfterSave", $this->log_events))
+        {
+            $isNew_string = $isNew ? 'true' : 'false';
+            $message = '{"title":"'.$article->title.'","isNew":"'.$isNew_string.'", "event":"onContentAfterSave"}';
+            $strContext = (string)$context;
+            $this->addLogsToDB($message, $strContext);
+        }
     }
 
     /**
@@ -186,7 +195,6 @@ class PlgSystemUserLogs extends JPlugin
         $success_string = $success ? 'true' : 'false';
         $message = '{"edited_user":"'.$user["name"].'","event":"onUserAfterSave",'.
                     '"isNew":"'.$isNew_string.'","success":"'.$success_string.'"}';
-
         $jinput = JFactory::getApplication()->input;
         $context = $jinput->get('option');
         $this->addLogsToDB($message, $context);
@@ -206,7 +214,7 @@ class PlgSystemUserLogs extends JPlugin
      public function onUserAfterDelete($user, $success, $msg)
      {
          $success_string = $success ? 'true' : 'false';
-         $message = '{"edited_user":"'.$user["name"].'","event":"onUserAfterSave",'.
+         $message = '{"deleted_user":"'.$user["name"].'","event":"onUserAfterDelete",'.
                      '"success":"'.$success_string.'"}';
          $jinput = JFactory::getApplication()->input;
          $context = $jinput->get('option');
@@ -232,5 +240,82 @@ class PlgSystemUserLogs extends JPlugin
           $jinput = JFactory::getApplication()->input;
           $context = $jinput->get('option');
           $this->addLogsToDB($message, $context);
+      }
+
+      public function onLogMessagePrepare($context, &$message, $extension)
+      {
+          JPlugin::loadLanguage();
+          if ($context == 'com_userlogs')
+          {
+              $extension = array_pop(explode('.', $extension));
+              $message_to_array = json_decode($message, true);
+              switch ($message_to_array['event']) {
+                  case 'onContentAfterSave':
+                  if ($message_to_array['isNew'] == 'false')
+                  {
+                      $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_AFTER_SAVE_MESSAGE', ucfirst($extension));
+                  }
+                  else
+                  {
+                      $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_AFTER_SAVE_NEW_MESSAGE', $extension);
+                  }
+                  if(!empty($message_to_array['title']))
+                  {
+                      $message = $message .  JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
+                  }
+                      break;
+                  case 'onContentAfterDelete':
+                    $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_AFTER_DELETE_MESSAGE', ucfirst($extension));
+                    if(!empty($message_to_array['title']))
+                    {
+                        $message = $message .  JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
+                    }
+                    break;
+                  case 'onContentChangeState':
+                    if ($message_to_array['value'] == 0)
+                    {
+                        $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_CHANGE_STATE_UNPUBLISHED_MESSAGE', ucfirst($extension));
+                    }
+                    elseif ($message_to_array['value'] == 1)
+                    {
+                        $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_CHANGE_STATE_PUBLISHED_MESSAGE', ucfirst($extension));
+                    }
+                    elseif ($message_to_array['value'] == 2)
+                    {
+                        $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_CHANGE_STATE_ARCHIVED_MESSAGE', ucfirst($extension));
+                    }
+                    elseif ($message_to_array['value'] == -2)
+                    {
+                        $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_CHANGE_STATE_TRASHED_MESSAGE', ucfirst($extension));
+                    }
+                    break;
+                  case 'onExtensionAfterInstall':
+                      $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_INSTALL_MESSAGE', $message_to_array['extenstion_id']);
+                    break;
+                  case 'onExtensionAfterUninstall':
+                    $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_UNINSTALL_MESSAGE', $message_to_array['extenstion_id']);
+                    break;
+                  case 'onExtensionAfterUpdate':
+                    $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_UPDATE_MESSAGE', $message_to_array['extenstion_id']);
+                    break;
+                  case 'onUserAfterSave':
+                      if ($message_to_array['isNew'] == 'false')
+                      {
+                          $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_SAVE_MESSAGE', $message_to_array['edited_user']);
+                      }
+                      else
+                      {
+                          $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_SAVE_NEW_MESSAGE', $message_to_array['edited_user']);
+                      }
+                      break;
+                case 'onUserAfterDelete':
+                    $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_DELETE_MESSAGE', $message_to_array['edited_user']);
+                    break;
+                case 'onUserAfterDeleteGroup':
+                    $message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_DELETE_GROUP_MESSAGE', $message_to_array['deleted_group']);
+                    break;
+
+              }
+          }
       }
 }
