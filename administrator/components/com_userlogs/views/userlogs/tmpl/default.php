@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
+$dispatcher = JEventDispatcher::getInstance();
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
@@ -27,7 +28,7 @@ JHtml::_('formbehavior.chosen', 'select');
         <?php else : ?>
             <table class="table table-striped table-hover" id="logsList">
                 <thead>
-					<th>
+					<th width="2%">
 						<?php echo JHtml::_('searchtools.sort', '', 'a.id', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2'); ?>
 					</th>
                     <th width="1%">
@@ -61,13 +62,14 @@ JHtml::_('formbehavior.chosen', 'select');
                             <?php echo JHtml::_('grid.id', $i, $item->id); ?>
                         </td>
                         <td>
+                            <?php $dispatcher->trigger('onLogMessagePrepare', array ('com_userlogs', &$item->message, $item->extension)); ?>
                             <?php echo $this->escape($item->message); ?>
                         </td>
                         <td>
                             <?php echo $this->escape($item->log_date); ?>
                         </td>
                         <td>
-                            <?php echo $this->escape($item->extension); ?>
+                            <?php echo $this->translateExtensionName(strtoupper(strtok($this->escape($item->extension), '.'))); ?>
                         </td>
                         <td>
                             <?php echo JUser::getInstance($item->user_id)->name; ?>

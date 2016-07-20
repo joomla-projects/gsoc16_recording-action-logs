@@ -23,13 +23,14 @@
         <option value="">COM_USERLOGS_EXTENSION</option>
         </field>
         <field
-            name="date"
-            type="calendar"
-            label="JDATE"
-            description=""
-            format="%Y-%m-%d"
+            name="dateRange"
+            type="logsdaterange"
+            label="COM_USERS_OPTION_FILTER_DATE"
+            description="COM_USERS_OPTION_FILTER_DATE"
             onchange="this.form.submit();"
-        />
+			>
+			<option value="">COM_USERSLOGS_OPTION_FILTER_DATE</option>
+		</field>
     </fields>
     <fields name="list">
 		<field

@@ -24,6 +24,8 @@ class UserlogsViewUserlogs extends JViewLegacy
 	protected $items;
 
     protected $state;
+
+    public $activeFilters;
     /**
      * Method to display the view.
      *
@@ -35,10 +37,17 @@ class UserlogsViewUserlogs extends JViewLegacy
      */
     public function display($tpl = null)
     {
+        if (!JFactory::getUser()->authorise('core.viewlogs', 'com_userlogs'))
+		{
+			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+		}
+
         $this->items     = $this->get('Items');
         $this->state     = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+        $pagination = $this->get('Pagination');
+
         if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
@@ -61,20 +70,22 @@ class UserlogsViewUserlogs extends JViewLegacy
     }
 
     /**
-     * Returns an array of fields the table can be sorted by
+     * Change the retrived extension name to more user friendly name
      *
-     * @return  array  Array containing the field name to sort by as the key and display text as value
+     * @param   string  $extension  Extension name
+     *
+     * @return  string  Translated extension name
      *
      * @since   3.6
      */
-    protected function getSortFields()
+    protected function translateExtensionName($extension)
     {
-        return array(
-            'a.message' => JText::_('JSTATUS'),
-            'a.user_id' => JText::_('COM_BANNERS_HEADING_NAME'),
-            'a.log_date' => JText::_('COM_BANNERS_HEADING_STICKY'),
-            'a.extension' => JText::_('JGRID_HEADING_LANGUAGE'),
-            'a.id' => JText::_('JGRID_HEADING_ID')
-        );
-    }
+        $lang = JFactory::getLanguage();
+        $source = JPATH_ADMINISTRATOR . '/components/' . $extension;
+
+        $lang->load("$extension.sys", JPATH_ADMINISTRATOR, null, false, true)
+         ||	$lang->load("$extension.sys", $source, null, false, true);
+
+        return JText::_($extension);
+     }
 }

@@ -45,8 +45,8 @@ class UserlogsModelUserlogs extends JModelList
         $this->setState('filter.user', $user);
         $extension = $app->getUserStateFromRequest($this->context . 'filter.extension', 'filter_extension', '', 'string');
         $this->setState('filter.extension', $extension);
-        $date = $app->getUserStateFromRequest($this->context . 'filter.date', 'filter_date', '', 'string');
-        $this->setState('filter.date', $date);
+        $dateRange = $app->getUserStateFromRequest($this->context . 'filter.dateRange', 'filter_dateRange', '', 'string');
+        $this->setState('filter.dateRange', $dateRange);
         parent::populateState('a.id', 'desc');
     }
 
@@ -59,33 +59,59 @@ class UserlogsModelUserlogs extends JModelList
         $query->select('a.*');
         $query->from($db->quoteName('#__user_logs', 'a'));
 
+        // Get ordering
         $fullorderCol = $this->state->get('list.fullordering', 'a.id ASC');
-        $user = $this->getState('filter.user');
-        $extension = $this->getState('filter.extension');
-        $search = $this->getState('filter.search');
-        $date = $this->getState('filter.date');
 
-        if ($fullorderCol != '')
+        // Apply ordering
+        if (!empty($fullorderCol))
         {
             $query->order($db->escape($fullorderCol));
         }
-        if ($user)
+        // Get filter by user
+        $user = $this->getState('filter.user');
+
+        // Apply filter by user
+        if (!empty($user))
         {
             $query->where($db->quoteName('a.user_id') . ' = ' . (int) $user);
         }
-        if ($extension != '')
+
+        // Get filter by extension
+        $extension = $this->getState('filter.extension');
+
+        // Apply filter by extension
+        if (!empty($extension))
         {
             $query->where($db->quoteName('a.extension') . ' = ' . $db->quote($extension));
         }
+
+        // Get filter by date range
+        $dateRange = $this->getState('filter.dateRange');
+
+        // Apply filter by date range
+        if (!empty($dateRange))
+        {
+            $date = $this->buildDateRange($dateRange);
+
+            // If the chosen range is not more than a year ago
+            if ($date['dNow'] != false)
+            {
+                $query->where(
+                    $db->qn('a.log_date') . ' >= ' . $db->quote($date['dStart']->format('Y-m-d H:i:s')) .
+                    ' AND ' . $db->qn('a.log_date') . ' <= ' . $db->quote($date['dNow']->format('Y-m-d H:i:s'))
+                );
+            }
+        }
+
+        // Filter the items over the search string if set.
+        $search = $this->getState('filter.search');
+
         if (!empty($search))
         {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
 			$query->where('(a.message LIKE ' . $search . ')');
         }
-        if (!empty($date))
-		{
-			$query->where($db->quoteName('a.log_date') . ' BETWEEN ' . $db->quote($date. ' 00:00:00') . 'AND' . $db->quote($date. ' 23:59:59'));
-		}
+
         return $query;
     }
 
@@ -104,4 +130,68 @@ class UserlogsModelUserlogs extends JModelList
             $result = $db->execute();
         }
     }
+
+    /**
+	 * Construct the date range to filter on.
+	 *
+	 * @param   string  $range  The textual range to construct the filter for.
+	 *
+	 * @return  string  The date range to filter on.
+	 *
+	 * @since   3.6.0
+	 */
+	private function buildDateRange($range)
+	{
+		// Get UTC for now.
+		$dNow   = new JDate;
+		$dStart = clone $dNow;
+
+		switch ($range)
+		{
+			case 'past_week':
+				$dStart->modify('-7 day');
+				break;
+
+			case 'past_1month':
+				$dStart->modify('-1 month');
+				break;
+
+			case 'past_3month':
+				$dStart->modify('-3 month');
+				break;
+
+			case 'past_6month':
+				$dStart->modify('-6 month');
+				break;
+
+			case 'post_year':
+				$dNow = false;
+			case 'past_year':
+				$dStart->modify('-1 year');
+				break;
+
+			case 'today':
+				// Ranges that need to align with local 'days' need special treatment.
+				$app    = JFactory::getApplication();
+				$offset = $app->get('offset');
+
+				// Reset the start time to be the beginning of today, local time.
+				$dStart = new JDate('now', $offset);
+				$dStart->setTime(0, 0, 0);
+
+				// Now change the timezone back to UTC.
+				$tz = new DateTimeZone('GMT');
+				$dStart->setTimezone($tz);
+				break;
+			case 'never':
+				$dNow = false;
+				$dStart = $this->_db->getNullDate();
+				break;
+            default:
+                return $range;
+            break;
+		}
+
+		return array('dNow' => $dNow, 'dStart' => $dStart);
+	}
 }

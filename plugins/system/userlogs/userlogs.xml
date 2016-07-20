@@ -20,7 +20,7 @@
                     description="PLG_SYSTEM_USERLOGS_LOG_DELETE_PERIOD_DESC"
                     >
                 </field>
-			</fieldset>
+            </fieldset>
 		</fields>
 	</config>
     <files>
