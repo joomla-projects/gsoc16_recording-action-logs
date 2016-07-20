@@ -37,6 +37,11 @@ class UserlogsViewUserlogs extends JViewLegacy
      */
     public function display($tpl = null)
     {
+        if (!JFactory::getUser()->authorise('core.viewlogs', 'com_userlogs'))
+		{
+			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+		}
+
         $this->items     = $this->get('Items');
         $this->state     = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
