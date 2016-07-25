@@ -197,4 +197,24 @@ class UserlogsModelUserlogs extends JModelList
 
 		return array('dNow' => $dNow, 'dStart' => $dStart);
 	}
+
+    /**
+     * Get logs data into JTable object
+     *
+     *
+     * @return  Array  All logs in the table
+     *
+     * @since   3.6.0
+     */
+    public function getLogsData()
+    {
+        $db    = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.*');
+        $query->from($db->quoteName('#__user_logs', 'a'));
+        $db->setQuery($query);
+        $db->execute();
+        $items = $db->loadObjectList();
+        return $items;
+    }
 }
