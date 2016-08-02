@@ -39,8 +39,17 @@ class PlgSystemUserLogs extends JPlugin
          $user = JFactory::getUser();
          $date = JFactory::getDate();
          $query = $db->getQuery(​true​);
-         $columns = array('message', 'log_date', 'extension', 'user_id');
-         $values = array($db->quote($message), $db->quote($date), $db->quote($context), $user->id);
+         if($this->params->get('ip_logging'))
+         {
+             $jinput = JFactory::getApplication()->input;
+             $ip_address = $jinput->server->get('REMOTE_ADDR');
+         }
+         else
+         {
+             $ip_address = JText::_('PLG_SYSTEM_USERLOG_DISABLED');
+         }
+         $columns = array('message', 'log_date', 'extension', 'user_id', 'ip_address');
+         $values = array($db->quote($message), $db->quote($date), $db->quote($context), $user->id, $db->quote($ip_address));
          $query
              ->insert($db->quoteName('#__user_logs'))
              ->columns($db->quoteName($columns))

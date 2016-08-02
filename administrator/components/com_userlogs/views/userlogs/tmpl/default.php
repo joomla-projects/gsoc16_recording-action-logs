@@ -48,6 +48,9 @@ JHtml::_('formbehavior.chosen', 'select');
                     <th>
                         <?php echo JHtml::_('searchtools.sort', 'COM_USERLOGS_USER', 'a.user_id', $listDirn, $listOrder); ?>
                     </th>
+                    <th>
+                        <?php echo JHtml::_('searchtools.sort', 'COM_USERLOGS_IP_ADDRESS', 'a.ip_address', $listDirn, $listOrder); ?>
+                    </th>
                 </thead>
                 <tbody>
                     <?php foreach ($this->items as $i => $item) :?>
@@ -73,6 +76,9 @@ JHtml::_('formbehavior.chosen', 'select');
                         </td>
                         <td>
                             <?php echo JUser::getInstance($item->user_id)->name; ?>
+                        </td>
+                        <td>
+                            <?php echo JText::_($this->escape($item->ip_address)); ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

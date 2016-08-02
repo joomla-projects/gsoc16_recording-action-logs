@@ -52,6 +52,8 @@
 			<option value="a.message DESC">COM_USERLOGS_MESSAGE_DESC</option>
             <option value="a.extension ASC">COM_USERLOGS_EXTENSION_ASC</option>
 			<option value="a.extension DESC">COM_USERLOGS_EXTENSION_DESC</option>
+            <option value="a.ip_address ASC">COM_USERLOGS_IP_ADDRESS_ASC</option>
+			<option value="a.ip_address DESC">COM_USERLOGS_IP_ADDRESS_DESC</option>
         </field>
     </fields>
 </form>

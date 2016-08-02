@@ -46,7 +46,6 @@ class UserlogsViewUserlogs extends JViewLegacy
         $this->state     = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
-        $pagination = $this->get('Pagination');
 
         if (count($errors = $this->get('Errors')))
 		{
@@ -67,6 +66,7 @@ class UserlogsViewUserlogs extends JViewLegacy
     protected function addToolbar()
     {
         JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
+        JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'Export', false);
     }
 
     /**

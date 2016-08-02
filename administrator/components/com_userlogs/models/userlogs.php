@@ -25,7 +25,8 @@ class UserlogsModelUserlogs extends JModelList
                 'a.extension', 'extension',
                 'a.user_id', 'user',
                 'a.message', 'message',
-                'a.log_date', 'log_date'
+                'a.log_date', 'log_date',
+                'a.ip_address', 'ip_address'
             );
         }
         parent::__construct($config);
@@ -45,6 +46,8 @@ class UserlogsModelUserlogs extends JModelList
         $this->setState('filter.user', $user);
         $extension = $app->getUserStateFromRequest($this->context . 'filter.extension', 'filter_extension', '', 'string');
         $this->setState('filter.extension', $extension);
+        $ip_address = $app->getUserStateFromRequest($this->context . 'filter.ip_address', 'filter_ip_address', '', 'string');
+        $this->setState('filter.ip_address', $ip_address);
         $dateRange = $app->getUserStateFromRequest($this->context . 'filter.dateRange', 'filter_dateRange', '', 'string');
         $this->setState('filter.dateRange', $dateRange);
         parent::populateState('a.id', 'desc');
@@ -194,4 +197,24 @@ class UserlogsModelUserlogs extends JModelList
 
 		return array('dNow' => $dNow, 'dStart' => $dStart);
 	}
+
+    /**
+     * Get logs data into JTable object
+     *
+     *
+     * @return  Array  All logs in the table
+     *
+     * @since   3.6.0
+     */
+    public function getLogsData()
+    {
+        $db    = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.*');
+        $query->from($db->quoteName('#__user_logs', 'a'));
+        $db->setQuery($query);
+        $db->execute();
+        $items = $db->loadObjectList();
+        return $items;
+    }
 }
