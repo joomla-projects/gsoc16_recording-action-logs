@@ -25,6 +25,8 @@ class UserlogsViewUserlogs extends JViewLegacy
 
     protected $state;
 
+    protected $pagination;
+
     public $activeFilters;
     /**
      * Method to display the view.
@@ -42,10 +44,11 @@ class UserlogsViewUserlogs extends JViewLegacy
 			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 		}
 
-        $this->items     = $this->get('Items');
-        $this->state     = $this->get('State');
+        $this->items         = $this->get('Items');
+        $this->state         = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+        $this->pagination    = $this->get('Pagination');
 
         if (count($errors = $this->get('Errors')))
 		{
@@ -66,7 +69,7 @@ class UserlogsViewUserlogs extends JViewLegacy
     protected function addToolbar()
     {
         JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
-        JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'Export', false);
+        JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'COM_USERLOGS_EXPORT_CSV', false);
     }
 
     /**
