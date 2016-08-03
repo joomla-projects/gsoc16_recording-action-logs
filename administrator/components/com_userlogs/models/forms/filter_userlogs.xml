@@ -56,4 +56,15 @@
 			<option value="a.ip_address DESC">COM_USERLOGS_IP_ADDRESS_DESC</option>
         </field>
     </fields>
+    <fields name="list">
+        <field
+            name="limit"
+            type="limitbox"
+            class="input-mini"
+            default="25"
+            label="COM_USERLOGS_LIST_LIMIT"
+            description="COM_USERLOGS_LIST_LIMIT_DESC"
+            onchange="this.form.submit();"
+        />
+    </fields>
 </form>

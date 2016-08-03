@@ -7,11 +7,11 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>admin@joomla.org</authorEmail>
 	<authorUrl>www.joomla.org</authorUrl>
-	<version>0.5.0</version>
+	<version>1.0.0</version>
     <description>PLG_SYSTEM_USERLOGS_XML_DESCRIPTION</description>
     <config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldpath="/plugins/system/userlogs/models/fields">
                 <field
                     name="logDeletePeriod"
                     type="number"
@@ -32,28 +32,20 @@
 					<option value="0">JNO</option>
 				</field>
                 <field
-                    name="log_events"
-                    type="checkboxes"
+                    name="loggable_extensions"
+                    type="logtype"
                     label="PLG_SYSTEM_USERLOGS_LOG_EXTENSIONS"
                     description="PLG_SYSTEM_USERLOGS_LOG_EXTENSIONS_DESC"
                     multiple="true"
-                    default= "onContentAfterSave,onContentAfterDelete,onContentChangeState,onExtensionAfterInstall,onExtensionAfterUninstall,onExtensionAfterUpdate,onUserAfterSave,onUserAfterDelete,onUserAfterDeleteGroup"
+                    default="com_banners,com_cache,com_categories,com_config,com_contact,com_content,com_installer,com_media,com_menus,com_messages,com_modules,com_newsfeeds,com_plugins,com_redirect,com_tags,com_templates,com_users"
                     >
-                    <option value="onContentAfterSave">PLG_SYSTEM_USERLOGS_OPTION_ON_CONTENT_SAVE</option>
-                    <option value="onContentAfterDelete">PLG_SYSTEM_USERLOGS_OPTION_ON_CONTENT_DELETE</option>
-                    <option value="onContentChangeState">PLG_SYSTEM_USERLOGS_OPTION_ON_CONTENT_CHANGE_STATE</option>
-                    <option value="onExtensionAfterInstall">PLG_SYSTEM_USERLOGS_OPTION_ON_EXTENSION_INSTALL</option>
-                    <option value="onExtensionAfterUninstall">PLG_SYSTEM_USERLOGS_OPTION_ON_EXTENSION_UNINSTALL</option>
-                    <option value="onExtensionAfterUpdate">PLG_SYSTEM_USERLOGS_OPTION_ON_EXTENSION_UPDATE</option>
-                    <option value="onUserAfterSave">PLG_SYSTEM_USERLOGS_OPTION_ON_USER_SAVE</option>
-                    <option value="onUserAfterDelete">PLG_SYSTEM_USERLOGS_OPTION_ON_USER_DELETE</option>
-                    <option value="onUserAfterDeleteGroup">PLG_SYSTEM_USERLOGS_OPTION_ON_USER_DELETE_GROUP</option>
                 </field>
             </fieldset>
 		</fields>
 	</config>
     <files>
         <folder>sql</folder>
+        <folder>models</folder>
         <filename plugin="userlogs">userlogs.php</filename>
         <filename>index.html</filename>
     </files>

@@ -52,6 +52,13 @@ JHtml::_('formbehavior.chosen', 'select');
                         <?php echo JHtml::_('searchtools.sort', 'COM_USERLOGS_IP_ADDRESS', 'a.ip_address', $listDirn, $listOrder); ?>
                     </th>
                 </thead>
+                <tfoot>
+					<tr>
+						<td colspan="13">
+							<?php echo $this->pagination->getListFooter(); ?>
+						</td>
+					</tr>
+				</tfoot>
                 <tbody>
                     <?php foreach ($this->items as $i => $item) :?>
                     <tr class="row<?php echo $i % 2; ?>">
@@ -65,7 +72,7 @@ JHtml::_('formbehavior.chosen', 'select');
                             <?php echo JHtml::_('grid.id', $i, $item->id); ?>
                         </td>
                         <td>
-                            <?php $dispatcher->trigger('onLogMessagePrepare', array ('com_userlogs', &$item->message, $item->extension)); ?>
+                            <?php $dispatcher->trigger('onLogMessagePrepare', array (&$item->message, $item->extension)); ?>
                             <?php echo $this->escape($item->message); ?>
                         </td>
                         <td>

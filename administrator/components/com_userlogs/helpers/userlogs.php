@@ -18,26 +18,34 @@ defined('_JEXEC') or die;
  {
     /**
      * Method to extract data array of objects into CSV file
+     *
+     * @param array $data Has the data to be exported
+     *
+     * @return void
      */
     public function dataToCsv($data)
     {
-        $date = JDate::getInstance('now');
+        $date = JFactory::getDate();
         $filename = "Logs_" . $date;
         $data = json_decode(json_encode($data), true);
+        $dispatcher = JEventDispatcher::getInstance();
         $app = JFactory::getApplication();
+        $app
+		->setHeader('Content-Type', 'application/csv', true)
+		->setHeader('Content-Disposition', 'attachment; filename="'.$filename.'.csv"', true);
+        $app->sendHeaders();
         $fp = fopen('php://temp', 'r+');
+        ob_end_clean();
         foreach ($data as $log)
         {
+            $dispatcher->trigger('onLogMessagePrepare', array (&$log['message'], $log['extension']));
+            $log['ip_address'] = JText::_($log['ip_address']);
+
             fputcsv($fp, $log, ',');
         }
         rewind($fp);
         $content = stream_get_contents($fp);
-        print $content;
-        $app
-		-> setHeader('Content-Type', 'application/cvs; charset=utf-8', true)
-		-> setHeader('Content-Disposition', 'attachment; filename="'.$filename.'.csv"', true)
-		-> setHeader('Content-Transfer-Encoding', 'binary', true)
-		-> setHeader('Expires', '0', true)
-		-> setHeader('Pragma','no-cache',true);
+        echo $content;
+        $app->close();
     }
  }
