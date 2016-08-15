@@ -16,7 +16,7 @@ defined('_JEXEC') or die;
  */
 class UserlogsModelUserlogs extends JModelList
 {
-    public function __contruct($config = array())
+    public function __construct($config = array())
     {
         if(empty($config['filter_fields']))
         {
@@ -36,10 +36,12 @@ class UserlogsModelUserlogs extends JModelList
 	 * Method to auto-populate the model state.
 	 *
 	 * @return  void
+     *
+     * @since 3.6
 	 */
     protected function populateState($ordering = null, $direction = null)
     {
-        $app = JFactory::getApplication('administrator');
+        $app = JFactory::getApplication();
         $search = $app->getUserStateFromRequest($this->context . 'filter.search', 'filter_search', '', 'string');
         $this->setState('filter.search', $search);
         $user = $app->getUserStateFromRequest($this->context . 'filter.user', 'filter_user', '', 'string');
@@ -63,7 +65,7 @@ class UserlogsModelUserlogs extends JModelList
         $query->from($db->quoteName('#__user_logs', 'a'));
 
         // Get ordering
-        $fullorderCol = $this->state->get('list.fullordering', 'a.id ASC');
+        $fullorderCol = $this->state->get('list.fullordering', 'a.id DESC');
 
         // Apply ordering
         if (!empty($fullorderCol))
@@ -121,16 +123,20 @@ class UserlogsModelUserlogs extends JModelList
     protected function checkIn()
     {
         $plugin = JPluginHelper::getPlugin('system', 'userlogs');
-        $pluginParams = new JRegistry($plugin->params);
-        $daysToDeleteAfter = (int)$pluginParams->get('logDeletePeriod');
+        if(!empty($plugin))
+        {
+            $pluginParams = new JRegistry($plugin->params);
+            $daysToDeleteAfter = (int)$pluginParams->get('logDeletePeriod');
 
-        if ($daysToDeleteAfter > 0) {
-            $db = JFactory::getDbo(); $query = $db->getQuery(true);
-            $conditions = array( $db->quoteName('log_date') .' < DATE_SUB(NOW(), INTERVAL '. $daysToDeleteAfter .' DAY)');
-            $query->delete($db->quoteName('#__user_logs'));
-            $query->where($conditions);
-            $db->setQuery($query);
-            $result = $db->execute();
+            if ($daysToDeleteAfter > 0) {
+                $db = JFactory::getDbo();
+                $query = $db->getQuery(true);
+                $conditions = array( $db->quoteName('log_date') .' < DATE_SUB(NOW(), INTERVAL '. $daysToDeleteAfter .' DAY)');
+                $query->delete($db->quoteName('#__user_logs'));
+                $query->where($conditions);
+                $db->setQuery($query);
+                $result = $db->execute();
+            }
         }
     }
 
@@ -206,15 +212,89 @@ class UserlogsModelUserlogs extends JModelList
      *
      * @since   3.6.0
      */
-    public function getLogsData()
+    public function getLogsData($pks = null)
     {
-        $db    = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->select('a.*');
-        $query->from($db->quoteName('#__user_logs', 'a'));
-        $db->setQuery($query);
-        $db->execute();
-        $items = $db->loadObjectList();
-        return $items;
+        if($pks == null)
+        {
+            $db    = $this->getDbo();
+            $query = $db->getQuery(true);
+            $query->select('a.*');
+            $query->from($db->quoteName('#__user_logs', 'a'));
+            $db->setQuery($query);
+            $db->execute();
+            $items = $db->loadObjectList();
+
+            return $items;
+        }
+        else
+        {
+            $items = array();
+            JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_userlogs/tables');
+            $table = $this->getTable('Userlogs', 'JTable');
+            foreach ($pks as $i => $pk)
+            {
+                $table->load($pk);
+                $items[] = (object) array(
+                    "id" => $table->id,
+                    "message" => $table->message,
+                    "log_date" => $table->log_date,
+                    "extension" => $table->extension,
+                    "user_id" => $table->user_id,
+                    "ip_address" => $table->ip_address,
+                );
+            }
+
+            return $items;
+        }
+    }
+    /**
+     * Delete logs
+     *
+     * @param array  Primary keys of logs
+     *
+     * @return  boolean
+     *
+     * @since   3.6.0
+     */
+    public function delete(&$pks)
+    {
+        // Check for request forgeries
+        JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
+        // Get the table
+        JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_userlogs/tables');
+        $table = $this->getTable('Userlogs', 'JTable');
+
+        if (!JFactory::getUser()->authorise('core.delete', $this->option))
+        {
+            $error = $this->getError();
+
+            if ($error)
+            {
+                $this->setError($error);
+            }
+            else
+            {
+                $this->setError(JText::_('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED'));
+            }
+
+            return false;
+        }
+
+        else
+        {
+            foreach ($pks as $i => $pk)
+            {
+
+                if (!$table->delete($pk))
+                {
+                    $this->setError($table->getError());
+
+                    return false;
+                }
+
+            }
+        }
+
+        return true;
     }
 }

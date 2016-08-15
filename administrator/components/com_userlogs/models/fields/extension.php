@@ -9,17 +9,20 @@
 
 defined('_JEXEC') or die;
 JFormHelper::loadFieldClass('list');
+JLoader::register('UserlogsHelper', JPATH_COMPONENT . '/helpers/userlogs.php');
 /**
  * Field to load a list of all users that have logged actions
+ *
+ * @since 3.6
  */
 class JFormFieldExtension extends JFormFieldList
 {
 
     /**
-    * The form field type.
-    *
-    * @var     string
-    * @since   1.6
+     * The form field type.
+     *
+     * @var     string
+     * @since   1.6
     */
    protected $type = 'extension';
 
@@ -32,10 +35,12 @@ class JFormFieldExtension extends JFormFieldList
        $db->setQuery($query);
        $extensions = $db->loadObjectList();
        $options = array();
-       foreach ($extensions as $e) {
-           $options[] = JHtml::_('select.option', $e->extension);
-        }
-        $options = array_merge(parent::getOptions(), $options);
+       foreach ($extensions as $e)
+       {
+           $text = UserlogsHelper::translateExtensionName(strtoupper(strtok($e->extension, '.')));
+           $options[] = JHtml::_('select.option', $e->extension, $text);
+       }
+       $options = array_merge(parent::getOptions(), $options);
        return $options;
    }
 
