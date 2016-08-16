@@ -7,12 +7,13 @@
             label="COM_USERLOGS_FILTER_SEARCH_DESC"
             hint="JSEARCH_FILTER"
         />
-        <field name="user" type="user"
-        	label="JGLOBAL_FIELD_MODIFIED_BY_LABEL"
-        	class="readonly"
-        	readonly="false"
-        	filter="unset"
-            />
+        <field
+            name="user"
+            type="logcreator"
+            onchange="this.form.submit();"
+            >
+            <option value="">COM_USERLOGS_SELECT_USER</option>
+        </field>
         <field
             name="extension"
             type="extension"

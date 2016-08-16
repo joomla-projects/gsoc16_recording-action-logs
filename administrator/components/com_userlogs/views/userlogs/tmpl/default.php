@@ -8,17 +8,16 @@
  */
 
 defined('_JEXEC') or die;
+JLoader::register('UserlogsHelper', JPATH_COMPONENT . '/helpers/userlogs.php');
 $listOrder	= $this->escape($this->state->get('list.ordering'));
 $listDirn	= $this->escape($this->state->get('list.direction'));
 $dispatcher = JEventDispatcher::getInstance();
 JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
-JHTML::_('behavior.calendar');
 JHtml::_('formbehavior.chosen', 'select');
 ?>
-<form action="<?php echo JRoute::_('index.php?option=com_userlogs&view=userlogs'); ?>"
-    method="post" name="adminForm" id="adminForm">
+<form action="<?php echo JRoute::_('index.php?option=com_userlogs&view=userlogs'); ?>" method="post" name="adminForm" id="adminForm">
     <div id="j-main-container">
         <?php echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?>
         <?php if (empty($this->items)) : ?>
@@ -79,7 +78,7 @@ JHtml::_('formbehavior.chosen', 'select');
                             <?php echo $this->escape($item->log_date); ?>
                         </td>
                         <td>
-                            <?php echo $this->translateExtensionName(strtoupper(strtok($this->escape($item->extension), '.'))); ?>
+                            <?php echo UserlogsHelper::translateExtensionName(strtoupper(strtok($this->escape($item->extension), '.'))); ?>
                         </td>
                         <td>
                             <?php echo JUser::getInstance($item->user_id)->name; ?>

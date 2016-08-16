@@ -20,6 +20,8 @@ class UserlogsViewUserlogs extends JViewLegacy
 	 * An array of items
 	 *
 	 * @var  array
+     *
+     * @since 3.6
 	 */
 	protected $items;
 
@@ -28,6 +30,7 @@ class UserlogsViewUserlogs extends JViewLegacy
     protected $pagination;
 
     public $activeFilters;
+
     /**
      * Method to display the view.
      *
@@ -56,6 +59,7 @@ class UserlogsViewUserlogs extends JViewLegacy
 			return false;
 		}
         $this->addToolBar();
+
         parent::display($tpl);
     }
 
@@ -69,26 +73,18 @@ class UserlogsViewUserlogs extends JViewLegacy
     protected function addToolbar()
     {
         JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
-        JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'COM_USERLOGS_EXPORT_CSV', false);
+
+        if (JFactory::getUser()->authorise('core.delete', 'com_userlogs'))
+        {
+            JToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'userlogs.delete');
+        }
+
+        if (JFactory::getUser()->authorise('core.admin', 'com_userlogs') || JFactory::getUser()->authorise('core.options', 'com_userlogs'))
+        {
+            JToolbarHelper::preferences('com_userlogs');
+        }
+
+        JToolBarHelper::custom('userlogs.exportSelectedLogs', 'download', '', 'COM_USERLOGS_EXPORT_CSV', true);
+        JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'COM_USERLOGS_EXPORT_ALL_CSV', false);
     }
-
-    /**
-     * Change the retrived extension name to more user friendly name
-     *
-     * @param   string  $extension  Extension name
-     *
-     * @return  string  Translated extension name
-     *
-     * @since   3.6
-     */
-    protected function translateExtensionName($extension)
-    {
-        $lang = JFactory::getLanguage();
-        $source = JPATH_ADMINISTRATOR . '/components/' . $extension;
-
-        $lang->load("$extension.sys", JPATH_ADMINISTRATOR, null, false, true)
-         ||	$lang->load("$extension.sys", $source, null, false, true);
-
-        return JText::_($extension);
-     }
 }
