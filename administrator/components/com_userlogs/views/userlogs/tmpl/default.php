@@ -16,6 +16,21 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
 JHtml::_('formbehavior.chosen', 'select');
+JFactory::getDocument()->addScriptDeclaration('
+    Joomla.submitbutton = function(task)
+    {
+        if (task == "userlogs.exportSelectedLogs" || task == "userlogs.exportLogs")
+        {
+            var form = document.getElementById("adminForm");
+            Joomla.submitform(task, form);
+            form.task.value = "";
+        }
+        else
+        {
+            Joomla.submitform(task);
+        }
+    };
+');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_userlogs&view=userlogs'); ?>" method="post" name="adminForm" id="adminForm">
     <div id="j-main-container">

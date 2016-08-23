@@ -1,10 +1,10 @@
 <?php
 /**
- * @package     Joomla.Administrator
+ * @package	 Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE
+ * @license	 GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('JPATH_PLATFORM') or die;
@@ -21,7 +21,7 @@ class JFormFieldLogCreator extends JFormFieldList
 	/**
 	 * The form field type.
 	 *
-	 * @var    string
+	 * @var	string
 	 * @since  3.2
 	 */
 	public $type = 'LogCreator';
@@ -29,7 +29,7 @@ class JFormFieldLogCreator extends JFormFieldList
 	/**
 	 * Cached array of the category items.
 	 *
-	 * @var    array
+	 * @var	array
 	 * @since  3.2
 	 */
 	protected static $options = array();
