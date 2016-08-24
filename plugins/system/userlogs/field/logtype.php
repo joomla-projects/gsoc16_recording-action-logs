@@ -25,7 +25,7 @@ class JFormFieldLogType extends JFormFieldCheckboxes
 	 * @var    string
 	 * @since  __DEPLOY_VERSION__
 	 */
-	protected $type = 'logtype';
+	protected $type = 'LogType';
 
 	/**
 	 * Method to get the field options.
