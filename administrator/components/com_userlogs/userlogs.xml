@@ -11,16 +11,16 @@
 	<description>COM_USERLOGS_XML_DESCRIPTION</description>
 	<administration>
 		<menu>COM_USERLOGS</menu>
-	<files folder="admin">
-		<filename>userlogs.php</filename>
-		<filename>config.xml</filename>
-		<filename>access.xml</filename>
-		<filename>controller.php</filename>
-		<folder>controllers</folder>
-		<folder>helpers</folder>
-		<folder>tables</folder>
-		<folder>models</folder>
-		<folder>views</folder>
+		<files folder="admin">
+			<filename>userlogs.php</filename>
+			<filename>config.xml</filename>
+			<filename>access.xml</filename>
+			<filename>controller.php</filename>
+			<folder>controllers</folder>
+			<folder>helpers</folder>
+			<folder>tables</folder>
+			<folder>models</folder>
+			<folder>views</folder>
 		</files>
 		<languages folder="admin">
 			<language tag="en-GB">language/en-GB/en-GB.com_userlogs.ini</language>
