@@ -1,10 +1,10 @@
 <?php
 /**
- * @package	 Joomla.Administrator
+ * @package     Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -12,18 +12,18 @@ defined('_JEXEC') or die;
 /**
  * Userlogs component helper.
  *
- * @since  3.6
+ * @since  __DEPLOY_VERSION__
  */
 abstract class UserlogsHelper
 {
 	/**
 	 * Method to extract data array of objects into CSV file
 	 *
-	 * @param array $data Has the data to be exported
+	 * @param   array  $data  Has the data to be exported
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public static function dataToCsv($data)
 	{
@@ -31,12 +31,14 @@ abstract class UserlogsHelper
 		$filename = "Logs_" . $date;
 		$data = json_decode(json_encode($data), true);
 		$dispatcher = JEventDispatcher::getInstance();
+
 		$app = JFactory::getApplication();
-		$app
-		->setHeader('Content-Type', 'application/csv', true)
-		->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '.csv"', true)
-		->setHeader('Cache-Control', 'must-revalidate', true);
+		$app->setHeader('Content-Type', 'application/csv', true)
+			->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '.csv"', true)
+			->setHeader('Cache-Control', 'must-revalidate', true);
+
 		$app->sendHeaders();
+
 		$fp = fopen('php://temp', 'r+');
 		ob_end_clean();
 
@@ -45,6 +47,7 @@ abstract class UserlogsHelper
 			$dispatcher->trigger('onLogMessagePrepare', array (&$log['message'], $log['extension']));
 			$log['ip_address'] = JText::_($log['ip_address']);
 			$log['extension'] = self::translateExtensionName(strtoupper(strtok($log['extension'], '.')));
+
 			fputcsv($fp, $log, ',');
 		}
 
@@ -63,11 +66,11 @@ abstract class UserlogsHelper
 	 *
 	 * @return  string  Translated extension name
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public static function translateExtensionName($extension)
 	{
-		$lang = JFactory::getLanguage();
+		$lang   = JFactory::getLanguage();
 		$source = JPATH_ADMINISTRATOR . '/components/' . $extension;
 
 		$lang->load("$extension.sys", JPATH_ADMINISTRATOR, null, false, true)
@@ -83,17 +86,18 @@ abstract class UserlogsHelper
 	 *
 	 * @return  mixed  An array of parameters, or false on error.
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public static function getLogMessageParams($context)
 	{
 		$db = JFactory::getDbo();
-		$query = $db->getQuery(​true​);
-		$query->select('a.*');
-		$query->from($db->quoteName('#__user_logs_extensions', 'a'));
-		$query->where($db->quoteName('a.type_alias') . ' = "' . $context . '"');
+		$query = $db->getQuery(​true​)
+				->select('a.*')
+				->from($db->quoteName('#__user_logs_extensions', 'a'))
+				->where($db->quoteName('a.type_alias') . ' = "' . $context . '"');
+
 		$db->setQuery($query);
-		$db->execute();
+
 		$items = $db->loadObjectList();
 
 		if (empty($items))
@@ -107,17 +111,19 @@ abstract class UserlogsHelper
 	/**
 	 * Method to retrive data by primary keys from a table
 	 *
-	 * @param   array	 $pks	  An array of primary key ids of the content that has changed state.
-	 * @param   string   $field  The field to get from the table
-	 * @param   string  $type    The type (name) of the JTable class to get an instance of.
-	 * @param   string  $prefix  An optional prefix for the table class name.
+	 * @param   array   $pks          An array of primary key ids of the content that has changed state.
+	 * @param   string  $field        The field to get from the table
+	 * @param   string  $tableType    The type (name) of the JTable class to get an instance of.
+	 * @param   string  $tablePrefix  An optional prefix for the table class name.
 	 *
-	 * @return array
+	 * @return  array
+	 *
+	 * @since   __DEPLOY_VERSION__
 	 */
-	public static function getDataByPks($pks, $field, $table_type, $table_prefix = 'JTable')
+	public static function getDataByPks($pks, $field, $tableType, $tablePrefix = 'JTable')
 	{
 		$items = array();
-		$table = JTable::getInstance($table_type, $table_prefix);
+		$table = JTable::getInstance($tableType, $tablePrefi);
 
 		foreach ($pks as $pk)
 		{

@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 /**
  * Userlogs Table class
  *
- * @since  0.0.1
+ * @since  __DEPLOY_VERSION__
  */
 class JTableUserlogs extends JTable
 {
@@ -21,9 +21,9 @@ class JTableUserlogs extends JTable
 	 *
 	 * @param   JDatabaseDriver  &$db  A database connector object
 	 *
-	 * @since 3.6
+	 * @since  __DEPLOY_VERSION__
 	 */
-	function __construct(&$db)
+	public function __construct(&$db)
 	{
 		parent::__construct('#__user_logs', 'id', $db);
 	}

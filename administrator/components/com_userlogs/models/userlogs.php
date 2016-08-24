@@ -1,18 +1,20 @@
 <?php
 /**
- * @package	 Joomla.Administrator
+ * @package     Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 
+use Joomla\Registry\Registry;
+
 /**
  * Methods supporting a list of article records.
  *
- * @since  3.6
+ * @since  __DEPLOY_VERSION__
  */
 class UserlogsModelUserlogs extends JModelList
 {
@@ -38,22 +40,28 @@ class UserlogsModelUserlogs extends JModelList
 	 *
 	 * @return  void
 	 *
-	 * @since 3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
-	protected function populateState($ordering = null, $direction = null)
+	protected function populateState($ordering = 'a.id', $direction = 'desc')
 	{
 		$app = JFactory::getApplication();
+
 		$search = $app->getUserStateFromRequest($this->context . 'filter.search', 'filter_search', '', 'string');
 		$this->setState('filter.search', $search);
+
 		$user = $app->getUserStateFromRequest($this->context . 'filter.user', 'filter_user', '', 'string');
 		$this->setState('filter.user', $user);
+
 		$extension = $app->getUserStateFromRequest($this->context . 'filter.extension', 'filter_extension', '', 'string');
 		$this->setState('filter.extension', $extension);
+
 		$ip_address = $app->getUserStateFromRequest($this->context . 'filter.ip_address', 'filter_ip_address', '', 'string');
 		$this->setState('filter.ip_address', $ip_address);
+
 		$dateRange = $app->getUserStateFromRequest($this->context . 'filter.dateRange', 'filter_dateRange', '', 'string');
 		$this->setState('filter.dateRange', $dateRange);
-		parent::populateState('a.id', 'desc');
+
+		parent::populateState($ordering, $direction);
 	}
 
 	/**
@@ -61,16 +69,16 @@ class UserlogsModelUserlogs extends JModelList
 	 *
 	 * @return  JDatabaseQuery
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	protected function getListQuery()
 	{
 		$this->checkIn();
 
-		$db	= $this->getDbo();
-		$query = $db->getQuery(true);
-		$query->select('a.*');
-		$query->from($db->quoteName('#__user_logs', 'a'));
+		$db    = $this->getDbo();
+		$query = $db->getQuery(true)
+				->select('a.*')
+				->from($db->quoteName('#__user_logs', 'a'));
 
 		// Get ordering
 		$fullorderCol = $this->state->get('list.fullordering', 'a.id DESC');
@@ -80,6 +88,7 @@ class UserlogsModelUserlogs extends JModelList
 		{
 			$query->order($db->escape($fullorderCol));
 		}
+
 		// Get filter by user
 		$user = $this->getState('filter.user');
 
@@ -133,7 +142,7 @@ class UserlogsModelUserlogs extends JModelList
 	 *
 	 * @return void
 	 *
-	 * @since 3.6
+	 * @since __DEPLOY_VERSION__
 	 */
 	protected function checkIn()
 	{
@@ -141,17 +150,19 @@ class UserlogsModelUserlogs extends JModelList
 
 		if (!empty($plugin))
 		{
-			$pluginParams = new JRegistry($plugin->params);
-			$daysToDeleteAfter = (int) $pluginParams->get('logDeletePeriod');
+			$pluginParams = new Registry($plugin->params);
+			$daysToDeleteAfter = (int) $pluginParams->get('logDeletePeriod', 0);
 
 			if ($daysToDeleteAfter > 0)
 			{
 				$db = JFactory::getDbo();
 				$query = $db->getQuery(true);
-				$conditions = array( $db->quoteName('log_date') . ' < DATE_SUB(NOW(), INTERVAL ' . $daysToDeleteAfter . ' DAY)');
+				$conditions = array($db->quoteName('log_date') . ' < DATE_SUB(NOW(), INTERVAL ' . $daysToDeleteAfter . ' DAY)');
+
 				$query->delete($db->quoteName('#__user_logs'));
 				$query->where($conditions);
 				$db->setQuery($query);
+
 				$result = $db->execute();
 			}
 		}
@@ -164,7 +175,7 @@ class UserlogsModelUserlogs extends JModelList
 	 *
 	 * @return  string  The date range to filter on.
 	 *
-	 * @since   3.6.0
+	 * @since   __DEPLOY_VERSION__
 	 */
 	private function buildDateRange($range)
 	{
@@ -198,8 +209,7 @@ class UserlogsModelUserlogs extends JModelList
 
 			case 'today':
 				// Ranges that need to align with local 'days' need special treatment.
-				$app	= JFactory::getApplication();
-				$offset = $app->get('offset');
+				$offset = JFactory::getApplication()->get('offset');
 
 				// Reset the start time to be the beginning of today, local time.
 				$dStart = new JDate('now', $offset);
@@ -209,10 +219,12 @@ class UserlogsModelUserlogs extends JModelList
 				$tz = new DateTimeZone('GMT');
 				$dStart->setTimezone($tz);
 				break;
+
 			case 'never':
 				$dNow = false;
 				$dStart = $this->_db->getNullDate();
 				break;
+
 			default:
 				return $range;
 			break;
@@ -227,21 +239,19 @@ class UserlogsModelUserlogs extends JModelList
 	 *
 	 * @return  Array  All logs in the table
 	 *
-	 * @since   3.6.0
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function getLogsData($pks = null)
 	{
 		if ($pks == null)
 		{
-			$db	= $this->getDbo();
-			$query = $db->getQuery(true);
-			$query->select('a.*');
-			$query->from($db->quoteName('#__user_logs', 'a'));
+			$db = $this->getDbo();
+			$query = $db->getQuery(true)
+					->select('a.*')
+					>from($db->quoteName('#__user_logs', 'a'));
 			$db->setQuery($query);
-			$db->execute();
-			$items = $db->loadObjectList();
 
-			return $items;
+			return $db->loadObjectList();
 		}
 		else
 		{
@@ -253,12 +263,12 @@ class UserlogsModelUserlogs extends JModelList
 			{
 				$table->load($pk);
 				$items[] = (object) array(
-					"id" => $table->id,
-					"message" => $table->message,
-					"log_date" => $table->log_date,
-					"extension" => $table->extension,
-					"user_id" => $table->user_id,
-					"ip_address" => $table->ip_address,
+					'id' => $table->id,
+					'message' => $table->message,
+					'log_date' => $table->log_date,
+					'extension' => $table->extension,
+					'user_id' => $table->user_id,
+					'ip_address' => $table->ip_address,
 				);
 			}
 
@@ -269,11 +279,11 @@ class UserlogsModelUserlogs extends JModelList
 	/**
 	 * Delete logs
 	 *
-	 * @param array  Primary keys of logs
+	 * @param   array  $pks  Primary keys of logs
 	 *
 	 * @return  boolean
 	 *
-	 * @since   3.6.0
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function delete(&$pks)
 	{
@@ -299,7 +309,6 @@ class UserlogsModelUserlogs extends JModelList
 
 			return false;
 		}
-
 		else
 		{
 			foreach ($pks as $i => $pk)

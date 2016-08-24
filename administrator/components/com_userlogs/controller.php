@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 /**
  * Userlogs Controller
  *
- * @since  1.6
+ * @since  __DEPLOY_VERSION__
  */
 class UserlogsController extends JControllerLegacy
 {

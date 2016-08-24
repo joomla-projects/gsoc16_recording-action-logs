@@ -1,58 +1,57 @@
 <?php
 /**
- * @package	 Joomla.Administrator
+ * @package     Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
 JLoader::register('UserlogsHelper', JPATH_COMPONENT . '/helpers/userlogs.php');
 
+use Joomla\Utilities\ArrayHelper;
+
 /**
  * Userlogs list controller class.
  *
- * @since  3.6
+ * @since  __DEPLOY_VERSION__
  */
 class UserlogsControllerUserlogs extends JControllerAdmin
 {
 	/**
 	 * Method to get a model object, loading it if required.
 	 *
-	 * @param   string  $name	The model name. Optional.
+	 * @param   string  $name    The model name. Optional.
 	 * @param   string  $prefix  The class prefix. Optional.
 	 * @param   array   $config  Configuration array for model. Optional.
 	 *
 	 * @return  object  The model.
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function getModel($name = 'Userlogs', $prefix = 'UserlogsModel',
 		$config = array('ignore_request' => true))
 	{
-		$model = parent::getModel($name, $prefix, $config);
 
-		return $model;
+		// Return the model
+		return parent::getModel($name, $prefix, $config);
 	}
 
 	/**
 	 * Method to export logs
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function exportLogs()
 	{
 		// Check for request forgeries.
 		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
 
-		// Get the model
-		$model = $this->getModel('userlogs');
-
 		// Get the logs data
-		$data = $model->getLogsData();
+		$data = $this->getModel('userlogs')->getLogsData();
 
 		// Export data to CSV file
 		UserlogsHelper::dataToCsv($data);
@@ -61,9 +60,9 @@ class UserlogsControllerUserlogs extends JControllerAdmin
 	/**
 	 * Method to delete logs
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function delete()
 	{
@@ -75,7 +74,7 @@ class UserlogsControllerUserlogs extends JControllerAdmin
 		$pks = $app->input->post->get('cid', array(), 'array');
 
 		// Sanitize the input
-		JArrayHelper::toInteger($pks);
+		$pks = ArrayHelper::toInteger($pks);
 
 		// Get the model
 		$model = $this->getModel('userlogs');
@@ -87,7 +86,6 @@ class UserlogsControllerUserlogs extends JControllerAdmin
 		{
 			$app->enqueueMessage(JText::_('COM_USERLOGS_DELETE_SUCCESS'), 'success');
 		}
-
 		else
 		{
 			$app->enqueueMessage(JText::_('COM_USERLOGS_DELETE_FAIL'), 'error');
@@ -100,26 +98,20 @@ class UserlogsControllerUserlogs extends JControllerAdmin
 	/**
 	 * Method to export logs
 	 *
-	 * @return void
+	 * @return  void
 	 *
-	 * @since 3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function exportSelectedLogs()
 	{
 		// Check for request forgeries.
 		JSession::checkToken() or die(JText::_('JINVALID_TOKEN'));
-		$document = JFactory::getDocument();
 
 		// Get selected logs
-		$app = JFactory::getApplication();
-		$pks = $app->input->post->get('cid', array(), 'array');
-		JArrayHelper::toInteger($pks);
-
-		// Get the model
-		$model = $this->getModel('userlogs');
+		$pks = ArrayHelper::toInteger(JFactory::getApplication()->input->post->get('cid', array(), 'array'));
 
 		// Get the logs data
-		$data = $model->getLogsData($pks);
+		$data = $this->getModel('userlogs')->getLogsData($pks);
 		$this->setRedirect(JRoute::_('index.php?option=com_userlogs&view=userlogs', true));
 
 		// Export data to CSV file

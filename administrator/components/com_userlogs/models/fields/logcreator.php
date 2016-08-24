@@ -1,10 +1,10 @@
 <?php
 /**
- * @package	 Joomla.Administrator
+ * @package     Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
 defined('JPATH_PLATFORM') or die;
@@ -14,23 +14,23 @@ JFormHelper::loadFieldClass('list');
 /**
  * Form Field to load a list of content authors
  *
- * @since  3.2
+ * @since  __DEPLOY_VERSION__
  */
 class JFormFieldLogCreator extends JFormFieldList
 {
 	/**
 	 * The form field type.
 	 *
-	 * @var	string
-	 * @since  3.2
+	 * @var    string
+	 * @since  __DEPLOY_VERSION__
 	 */
-	public $type = 'LogCreator';
+	protected $type = 'LogCreator';
 
 	/**
 	 * Cached array of the category items.
 	 *
-	 * @var	array
-	 * @since  3.2
+	 * @var    array
+	 * @since  __DEPLOY_VERSION__
 	 */
 	protected static $options = array();
 
@@ -39,7 +39,7 @@ class JFormFieldLogCreator extends JFormFieldList
 	 *
 	 * @return  array  The field option objects.
 	 *
-	 * @since   3.2
+	 * @since   __DEPLOY_VERSION__
 	 */
 	protected function getOptions()
 	{
