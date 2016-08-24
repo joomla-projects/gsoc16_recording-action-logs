@@ -13,23 +13,31 @@ JLoader::register('UserlogsHelper', JPATH_ADMINISTRATOR . '/components/com_userl
 /**
  * Joomla! Users Actions Logging Plugin.
  *
- * @since  3.7
+ * @since  __DEPLOY_VERSION__
  */
 class PlgSystemUserLogs extends JPlugin
 {
 	/**
+	 * Load the language file on instantiation.
+	 *
+	 * @var    boolean
+	 * @since  __DEPLOY_VERSION__
+	 */
+	protected $autoloadLanguage = true;
+
+	/**
 	 * Array of loggable extensions.
 	 *
 	 * @var    array
-	 * @since  3.6
+	 * @since  __DEPLOY_VERSION__
 	 */
-	protected $loggable_extensions = array();
+	protected $loggableExtensions = array();
 
 	/**
 	 * Application object.
 	 *
 	 * @var    JApplicationCms
-	 * @since  3.6
+	 * @since  __DEPLOY_VERSION__
 	 */
 	protected $app;
 
@@ -37,7 +45,7 @@ class PlgSystemUserLogs extends JPlugin
 	 * Database object.
 	 *
 	 * @var    JDatabaseDriver
-	 * @since  3.6
+	 * @since  __DEPLOY_VERSION__
 	 */
 	protected $db;
 
@@ -47,20 +55,19 @@ class PlgSystemUserLogs extends JPlugin
 	 * @param   object  &$subject  The object to observe.
 	 * @param   array   $config    An optional associative array of configuration settings.
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function __construct(&$subject, $config)
 	{
 		parent::__construct($subject, $config);
 
-		if (is_array($this->params->get('loggable_extensions')))
+		if (is_array($this->params->get('loggableExtensions')))
 		{
-			$this->loggable_extensions = $this->params->get('loggable_extensions');
+			$this->loggableExtensions = $this->params->get('loggableExtensions');
 		}
-
 		else
 		{
-			$this->loggable_extensions = explode(',', $this->params->get('loggable_extensions'));
+			$this->loggableExtensions = explode(',', $this->params->get('loggableExtensions'));
 		}
 	}
 
@@ -73,35 +80,48 @@ class PlgSystemUserLogs extends JPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
  	*/
 	protected function addLogsToDb($message, $context)
 	{
-		$user = JFactory::getUser();
-		$date = JFactory::getDate();
+		$user       = JFactory::getUser();
+		$date       = JFactory::getDate();
 		$dispatcher = JEventDispatcher::getInstance();
-		$query = $this->db->getQuery(​true​);
+		$query      = $this->db->getQuery(​true​);
 
-		if ($this->params->get('ip_logging'))
+		if ($this->params->get('ip_logging', 0))
 		{
-			$ip_address = $this->app->input->server->get('REMOTE_ADDR');
+			$ip = $this->app->input->server->get('REMOTE_ADDR');
 		}
 		else
 		{
-			$ip_address = JText::_('PLG_SYSTEM_USERLOG_DISABLED');
+			$ip = JText::_('PLG_SYSTEM_USERLOG_DISABLED');
 		}
 
-		$columns = array('message', 'log_date', 'extension', 'user_id', 'ip_address');
-		$values = array($this->db->quote($message), $this->db->quote($date),
-			$this->db->quote($context), $this->db->quote($user->id), $this->db->quote($ip_address)
+		$columns = array(
+			'message',
+			'log_date',
+			'extension',
+			'user_id',
+			'ip_address',
 		);
-		$query
-			->insert($this->db->quoteName('#__user_logs'))
+
+		$values = array(
+			$this->db->quote($message),
+			$this->db->quote($date),
+			$this->db->quote($context),
+			$this->db->quote($user->id),
+			$this->db->quote($ip),
+		);
+
+		$query->insert($this->db->quoteName('#__user_logs'))
 			->columns($this->db->quoteName($columns))
 			->values(implode(',', $values));
+
 		$this->db->setQuery($query);
 		$this->db->execute();
-		$dispatcher->trigger('onUserLogsAfterMessageLog', array ($message, $date, $context, $user->name, $ip_address));
+
+		$dispatcher->trigger('onUserLogsAfterMessageLog', array ($message, $date, $context, $user->name, $ip));
 	}
 
 	/**
@@ -111,11 +131,11 @@ class PlgSystemUserLogs extends JPlugin
 	 *
 	 * @return  boolean
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	protected function checkLoggable($extension)
 	{
-		if (!in_array($extension, $this->loggable_extensions))
+		if (!in_array($extension, $this->loggableExtensions))
 		{
 			return false;
 		}
@@ -130,21 +150,21 @@ class PlgSystemUserLogs extends JPlugin
 	 *
 	 * @param   string   $context  The context of the content passed to the plugin
 	 * @param   object   $article  A JTableContent object
-	 * @param   boolean  $isNew	If the content is just about to be created
+	 * @param   boolean  $isNew    If the content is just about to be created
 	 *
 	 * @return  boolean   true if function not enabled, is in front-end or is new. Else true or
-	 *					false depending on success of save function.
+	 *                    false depending on success of save function.
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onContentAfterSave($context, $content, $isNew)
 	{
 		if ($this->checkLoggable($this->app->input->get('option')))
 		{
 			$isNew_string = $isNew ? 'true' : 'false';
-			$parameters = UserlogsHelper::getLogMessageParams($context);
-			$title_holder = "";
-			$title_type = "";
+			$parameters   = UserlogsHelper::getLogMessageParams($context);
+			$title_holder = '';
+			$title_type   = '';
 
 			if ($parameters)
 			{
@@ -152,8 +172,11 @@ class PlgSystemUserLogs extends JPlugin
 				$type_title = $parameters->type_title;
 			}
 
-			$message = '{"title":"' . $title_holder . '","isNew":"' . $isNew_string . '", "event":"onContentAfterSave",'
-				. '"type":"' . $type_title . '"}';
+			$message = '{"title":"' . $title_holder
+						. '","isNew":"' . $isNew_string
+						. '", "event":"onContentAfterSave",'
+						. '"type":"' . $type_title . '"}';
+
 			$strContext = (string) $context;
 			$this->addLogsToDb($message, $strContext);
 		}
@@ -169,24 +192,26 @@ class PlgSystemUserLogs extends JPlugin
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onContentAfterDelete($context, $content)
 	{
 		if ($this->checkLoggable($this->app->input->get('option')))
 		{
-			$parameters = UserlogsHelper::getLogMessageParams($context);
-			$title_holder = "";
-			$title_type = "";
+			$parameters   = UserlogsHelper::getLogMessageParams($context);
+			$title_holder = '';
+			$title_type   = '';
 
 			if ($parameters)
 			{
 				$title_holder = $content->get($parameters->title_holder);
-				$type_title = $parameters->type_title;
+				$type_title   = $parameters->type_title;
 			}
 
-			$message = '{"title":"' . $title_holder . '","event":"onContentAfterDelete",'
-				. '"type":"' . $type_title . '"}';
+			$message = '{"title":"' . $title_holder
+						. '","event":"onContentAfterDelete",'
+						. '"type":"' . $type_title . '"}';
+
 			$strContext = (string) $context;
 			$this->addLogsToDb($message, $strContext);
 		}
@@ -198,29 +223,31 @@ class PlgSystemUserLogs extends JPlugin
 	 * Method is called when the status of the article is changed
 	 *
 	 * @param   string   $context  The context of the content passed to the plugin
-	 * @param   array	$pks	  An array of primary key ids of the content that has changed state.
-	 * @param   int	  $value	The value of the state that the content has been changed to.
+	 * @param   array    $pks      An array of primary key ids of the content that has changed state.
+	 * @param   integer  $value    The value of the state that the content has been changed to.
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onContentChangeState($context, $pks, $value)
 	{
 		if ($this->checkLoggable($this->app->input->get('option')))
 		{
 			$parameters = UserlogsHelper::getLogMessageParams($context);
-			$titles = array();
+			$titles     = array();
 
 			if ($parameters)
 			{
 				$table_values = json_decode($parameters->table_values, true);
-				$titles = UserlogsHelper::getDataByPks($pks, $parameters->title_holder, $table_values['table_type'], $table_values['table_prefix']);
+				$titles       = UserlogsHelper::getDataByPks($pks, $parameters->title_holder, $table_values['table_type'], $table_values['table_prefix']);
 			}
 
 			$message = '{"event":"onContentChangeState",'
 						. '"type":"' . $parameters->type_title . '",'
-						. '"title":"' . implode('\",\"', $titles) . '","value":' . (string) $value . '}';
+						. '"title":"' . implode('\",\"', $titles) . '","value":'
+						. (string) $value . '}';
+
 			$strContext = (string) $context;
 			$this->addLogsToDb($message, $strContext);
 		}
@@ -232,11 +259,11 @@ class PlgSystemUserLogs extends JPlugin
 	 * Method is called when an extension is installed
 	 *
 	 * @param   JInstaller  $installer  Installer object
-	 * @param   integer	 $eid		Extension Identifier
+	 * @param   integer     $eid        Extension Identifier
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onExtensionAfterInstall($installer, $eid)
 	{
@@ -256,12 +283,12 @@ $this->addLogsToDb($message, $context);
 	 * Method is called when an extension is uninstalled
 	 *
 	 * @param   JInstaller  $installer  Installer instance
-	 * @param   integer	 $eid		Extension id
-	 * @param   integer	 $result	 Installation result
+	 * @param   integer     $eid        Extension id
+	 * @param   integer     $result     Installation result
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onExtensionAfterUninstall($installer, $eid, $result)
 	{
@@ -281,11 +308,11 @@ $this->addLogsToDb($message, $context);
 	 * Method is called when an extension is updated
 	 *
 	 * @param   JInstaller  $installer  Installer instance
-	 * @param   integer	 $eid		Extension id
+	 * @param   integer     $eid        Extension id
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onExtensionAfterUpdate($installer, $eid)
 	{
@@ -295,6 +322,7 @@ $this->addLogsToDb($message, $context);
 		{
 			$message = '{"event":"onExtensionAfterUpdate","extenstion_name":"' . $installer->get('manifest')->name .
 				'","extenstion_type":"' . $installer->get('manifest')->attributes()['type'] . '"}';
+
 			$this->addLogsToDb($message, $context);
 		}
 	}
@@ -309,15 +337,15 @@ $this->addLogsToDb($message, $context);
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onExtensionAfterSave($context, $table, $isNew)
 	{
 		if ($this->checkLoggable($this->app->input->get('option')))
 		{
-			$parameters = UserlogsHelper::getLogMessageParams($context);
+			$parameters   = UserlogsHelper::getLogMessageParams($context);
 			$title_holder = "";
-			$title_type = "";
+			$title_type   = "";
 
 			if ($parameters)
 			{
@@ -326,8 +354,10 @@ $this->addLogsToDb($message, $context);
 			}
 
 			$isNew_string = $isNew ? 'true' : 'false';
+
 			$message = '{"title":"' . $table->get($parameters->title_holder) . '","isNew":"' . $isNew_string . '", "event":"onExtensionAfterSave",' .
 				'"type":"' . $parameters->type_title . '"}';
+
 			$this->addLogsToDb($message, $context);
 		}
 	}
@@ -336,12 +366,12 @@ $this->addLogsToDb($message, $context);
 	 * On Deleting extensions logging method
 	 * Method is called when an extension is being deleted
 	 *
-	 * @param   string  $context	The extension
-	 * @param   JTable	 $table   DataBase Table object
+	 * @param   string  $context  The extension
+	 * @param   JTable  $table    DataBase Table object
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onExtensionAfterDelete($context, $table)
 	{
@@ -349,6 +379,7 @@ $this->addLogsToDb($message, $context);
 		{
 			$isNew_string = $isNew ? 'true' : 'false';
 			$message = '{"event":"onExtensionAfterDelete","title":"' . $table->title . '"}';
+
 			$this->addLogsToDb($message, $context);
 		}
 	}
@@ -359,14 +390,14 @@ $this->addLogsToDb($message, $context);
 	 * Method is called after user data is stored in the database.
 	 * This method logs who created/edited any user's data
 	 *
-	 * @param   array	$user	 Holds the new user data.
-	 * @param   boolean  $isnew	True if a new user is stored.
+	 * @param   array    $user     Holds the new user data.
+	 * @param   boolean  $isnew    True if a new user is stored.
 	 * @param   boolean  $success  True if user was succesfully stored in the database.
-	 * @param   string   $msg	  Message.
+	 * @param   string   $msg      Message.
 	 *
 	 * @return  void
 	 *
-	 * @since   3.7
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function onUserAfterSave($user, $isnew, $success, $msg)
 	{
@@ -378,6 +409,7 @@ $this->addLogsToDb($message, $context);
 			$success_string = $success ? 'true' : 'false';
 			$message = '{"edited_user":"' . $user["name"] . '","event":"onUserAfterSave",' .
 						'"isNew":"' . $isNew_string . '","success":"' . $success_string . '", "user_id":' . $user["id"] . '}';
+
 			$this->addLogsToDb($message, $context);
 		}
 	}
@@ -387,9 +419,9 @@ $this->addLogsToDb($message, $context);
 	 *
 	 * Method is called after user data is deleted from the database
 	 *
-	 * @param   array	$user	 Holds the user data
+	 * @param   array    $user     Holds the user data
 	 * @param   boolean  $success  True if user was succesfully stored in the database
-	 * @param   string   $msg	  Message
+	 * @param   string   $msg      Message
 	 *
 	 * @return  boolean
 	 */
@@ -411,9 +443,9 @@ $this->addLogsToDb($message, $context);
   *
   * Method is called after user data is deleted from the database
   *
-  * @param   array	$group	 Holds the group data
+  * @param   array    $group    Holds the group data
   * @param   boolean  $success  True if user was succesfully stored in the database
-  * @param   string   $msg	  Message
+  * @param   string   $msg      Message
   *
   * @return  boolean
   */
@@ -435,9 +467,9 @@ $this->addLogsToDb($message, $context);
 	 *
 	 * Method is called after user data is deleted from the database
 	 *
-	 * @param   array	$group	 Holds the group data
+	 * @param   array    $group    Holds the group data
 	 * @param   boolean  $success  True if user was succesfully stored in the database
-	 * @param   string   $msg	  Message
+	 * @param   string   $msg      Message
 	 *
 	 * @return  boolean
 	 */
@@ -457,8 +489,8 @@ $this->addLogsToDb($message, $context);
 	/**
 	 * Method is called before writing logs message to make it more readable
 	 *
-	 * @param   string   $message	  Message
-	 * @param   string   $extension	Extension that caused this log
+	 * @param   string  $message    Message
+	 * @param   string  $extension  Extension that caused this log
 	 *
 	 * @return  boolean
   */
@@ -467,7 +499,6 @@ $this->addLogsToDb($message, $context);
 		JPlugin::loadLanguage();
 
 		$extension = UserlogsHelper::translateExtensionName(strtoupper(strtok($extension, '.')));
-
 		$extension = preg_replace('/s$/', '', $extension);
 		$message_to_array = json_decode($message, true);
 
@@ -479,8 +510,7 @@ $this->addLogsToDb($message, $context);
 		switch ($message_to_array['event'])
 		{
 			case 'onContentAfterSave':
-
-				if ($message_to_array[ 'isNew' ] == 'false')
+				if ($message_to_array['isNew'] == 'false')
 				{
 					$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_AFTER_SAVE_MESSAGE', ucfirst(JText::_($type)));
 				}
@@ -494,7 +524,8 @@ $this->addLogsToDb($message, $context);
 					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
 				}
 
-break;
+				break;
+
 			case 'onContentAfterDelete':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_CONTENT_AFTER_DELETE_MESSAGE', ucfirst(JText::_($type)));
 
@@ -502,7 +533,9 @@ break;
 				{
 					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
 				}
+
 				break;
+
 			case 'onContentChangeState':
 				if ($message_to_array['value'] == 0)
 				{
@@ -528,15 +561,19 @@ break;
 						ucfirst(JText::_($type)), $message_to_array['title']
 					);
 				}
+
 				break;
 			case 'onExtensionAfterInstall':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_INSTALL_MESSAGE', $message_to_array['extenstion_name']);
+
 				break;
 			case 'onExtensionAfterUninstall':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_UNINSTALL_MESSAGE', $message_to_array['extenstion_name']);
+
 				break;
 			case 'onExtensionAfterUpdate':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_UPDATE_MESSAGE', $message_to_array['extenstion_name']);
+
 				break;
 			case 'onUserAfterSave':
 				if ($message_to_array['isNew'] == 'false')
@@ -547,9 +584,11 @@ break;
 				{
 					$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_SAVE_NEW_MESSAGE', $message_to_array['edited_user']);
 				}
+
 				break;
 			case 'onUserAfterDelete':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_DELETE_MESSAGE', $message_to_array['edited_user']);
+
 				break;
 			case 'onUserAfterSaveGroup':
 				if ($message_to_array['isNew'] == 'false')
@@ -560,9 +599,11 @@ break;
 				{
 					$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_SAVE_GROUP_NEW_MESSAGE', $message_to_array['title']);
 				}
+
 				break;
 			case 'onUserAfterDeleteGroup':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_USER_AFTER_DELETE_GROUP_MESSAGE', $message_to_array['deleted_group']);
+
 				break;
 			case 'onExtensionAfterSave':
 				if ($message_to_array['isNew'] == 'false')
@@ -578,6 +619,7 @@ break;
 				{
 					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
 				}
+
 				break;
 			case 'onExtensionAfterDelete':
 				$message = JText::sprintf('PLG_SYSTEM_USERLOG_ON_EXTENSION_AFTER_DELETE_MESSAGE', $extension);
@@ -586,25 +628,23 @@ break;
 				{
 					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
 				}
+
 				break;
 		}
 	}
 
 	/**
-  * Adds additional fields to the user editing form for logs e-mail notifications
-  *
-  * @param   JForm  $form  The form to be altered.
-  * @param   mixed  $data  The associated data for the form.
-  *
-  * @return  boolean
-  *
-  * @since   1.6
-  */
+	 * Adds additional fields to the user editing form for logs e-mail notifications
+	 *
+	 * @param   JForm  $form  The form to be altered.
+	 * @param   mixed  $data  The associated data for the form.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
 	public function onContentPrepareForm($form, $data)
 	{
-		$lang = JFactory::getLanguage();
-		$lang->load('plg_system_userlogs', JPATH_ADMINISTRATOR);
-
 		if (!$form instanceof JForm)
 		{
 			$this->subject->setError('JERROR_NOT_A_FORM');
@@ -612,13 +652,21 @@ break;
 			return false;
 		}
 
-		if (!in_array($form->getName(), array('com_users.profile', 'com_users.registration','com_users.user','com_admin.profile')))
+		$formName = $form->getName();
+		$allowedFormNames = array(
+			'com_users.profile',
+			'com_users.registration',
+			'com_users.user',
+			'com_admin.profile',
+		);
+
+		if (!in_array($formName, $allowedFormNames))
 		{
 			return true;
 		}
 
-		if ($form->getName() == 'com_admin.profile'
-			|| $form->getName() == 'com_users.profile')
+		if ($formName == 'com_admin.profile'
+			|| $formName == 'com_users.profile')
 		{
 			JForm::addFormPath(dirname(__FILE__) . '/profiles');
 			$form->loadFile('profile', false);
@@ -634,17 +682,21 @@ break;
 	/**
 	 * Method called after event log is stored to database
 	 *
-	 * @param   array  $values	The data logged to the database
+	 * @param   array  $values  The data logged to the database
 	 *
 	 * @return  boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
 	 */
-	public function onUserLogsAfterMessageLog($message, $date, $context, $user_name, $ip_address)
+	public function onUserLogsAfterMessageLog($message, $date, $context, $user_name, $ip)
 	{
 		$dispatcher = JEventDispatcher::getInstance();
-		$query = $this->db->getQuery(true);
-		$query->select('a.email, a.params');
-		$query->from($this->db->quoteName('#__users', 'a'));
-		$query->where($this->db->quoteName('params') . ' LIKE ' . $this->db->quote('%"logs_notification_option":"1"%'));
+		$query      = $this->db->getQuery(true);
+
+		$query->select('a.email, a.params')
+			->from($this->db->quoteName('#__users', 'a'))
+			->where($this->db->quoteName('params') . ' LIKE ' . $this->db->quote('%"logs_notification_option":"1"%'));
+
 		$this->db->setQuery($query);
 		$this->db->execute();
 
@@ -688,21 +740,22 @@ break;
 						<td>' . $log_date . '</td>
 						<td>' . UserlogsHelper::translateExtensionName(strtoupper(strtok($extension), '.')) . '</td>
 						<td>' . $user_name . '</td>
-						<td>' . JText::_($ip_address) . '</td>
+						<td>' . JText::_($ip) . '</td>
 			</tr></tbody></table>';
 		$mailer = JFactory::getMailer();
 
-		$config = JFactory::getConfig();
 		$sender = array(
-			$config->get('mailfrom'),
-			$config->get('fromname')
+			JFactory::getConfig()->get('mailfrom'),
+			JFactory::getConfig()->get('fromname'),
 		);
+
 		$mailer->setSender($sender);
 		$mailer->addRecipient($recipients);
 		$mailer->setSubject(JText::_('PLG_SYSTEM_USERLOG_EMAIL_SUBJECT'));
 		$mailer->isHTML(true);
 		$mailer->Encoding = 'base64';
 		$mailer->setBody($body);
+
 		$send = $mailer->Send();
 	}
 }

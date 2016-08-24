@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
 	<fields name="params">
-		<fieldset name="settings"
-				  addfieldpath="/plugins/system/userlogs/models/fields"
-		>
+		<fieldset name="settings" addfieldpath="/plugins/system/userlogs/models/fields">
 			<field
 				name="logs_notification_option"
 				type="radio"
@@ -12,7 +10,7 @@
 				class="btn-group btn-group-yesno"
 				default="0"
 				required="true"
-				>
+			>
 				<option value="1">JYES</option>
 				<option value="0">JNO</option>
 			</field>

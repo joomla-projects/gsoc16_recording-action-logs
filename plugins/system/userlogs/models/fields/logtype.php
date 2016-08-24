@@ -15,45 +15,62 @@ JLoader::register('UserlogsHelper', JPATH_ADMINISTRATOR . '/components/com_userl
 /**
  * Field to load a list of all users that have logged actions
  *
- * @since 3.6
+ * @since __DEPLOY_VERSION__
  */
 class JFormFieldLogType extends JFormFieldCheckboxes
 {
 	/**
 	 * The form field type.
 	 *
-	 * @var	 string
-	 * @since   3.6
+	 * @var    string
+	 * @since  __DEPLOY_VERSION__
 	 */
 	protected $type = 'logtype';
 
+	/**
+	 * Method to get the field options.
+	 *
+	 * @return  array  The field option objects.
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
 	public function getOptions()
 	{
-		// $db = JFactory::getDbo();
-		// $query = $db->getQuery(true);
-		// $query->select('b.extension');
-		// $query->from($db->quoteName('#__user_logs_extensions', 'b'));
-		// $db->setQuery($query);
-		// $extensions = $db->loadObjectList();
 		$extensions = array(
-			"com_banners","com_cache","com_categories","com_config","com_contact","com_content","com_installer"
-			,"com_media","com_menus","com_messages","com_modules","com_newsfeeds","com_plugins","com_redirect"
-			,"com_tags","com_templates","com_users");
-		$options = array();
+			'com_banners',
+			'com_cache',
+			'com_categories',
+			'com_config',
+			'com_contact',
+			'com_content',
+			'com_installer',
+			'com_media',
+			'com_menus',
+			'com_messages',
+			'com_modules',
+			'com_newsfeeds',
+			'com_plugins',
+			'com_redirect',
+			'com_tags',
+			'com_templates',
+			'com_users',
+		);
+
+		$options  = array();
 		$defaults = array();
 
-		foreach ($extensions as $e)
+		foreach ($extensions as $extension)
 		{
 			$tmp = array(
 				'checked' => true,
 			);
-			$defaults[] = $e;
-			$option = JHtml::_('select.option', $e, UserlogsHelper::translateExtensionName($e));
+
+			$defaults[] = $extension;
+
+			$option = JHtml::_('select.option', $extension, UserlogsHelper::translateExtensionName($extension));
 			$options[] = (object) array_merge($tmp, (array) $option);
 		}
 
-		$options = array_merge(parent::getOptions(), $options);
-
-		return $options;
+		return array_merge(parent::getOptions(), $options);
 	}
 }
