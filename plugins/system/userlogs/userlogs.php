@@ -1,10 +1,10 @@
 <?php
 /**
- * @package	 Joomla.Plugins
+ * @package     Joomla.Plugins
  * @subpackage  System.userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -273,7 +273,8 @@ class PlgSystemUserLogs extends JPlugin
 		{
 			$message = '{"event":"onExtensionAfterInstall","extenstion_name":"' . $installer->get('manifest')->name .
 				'","extenstion_type":"' . $installer->get('manifest')->attributes()['type'] . '"}';
-$this->addLogsToDb($message, $context);
+
+			$this->addLogsToDb($message, $context);
 		}
 	}
 
@@ -331,9 +332,9 @@ $this->addLogsToDb($message, $context);
 	 * On Saving extensions logging method
 	 * Method is called when an extension is being saved
 	 *
-	 * @param   string   $context   The extension
-	 * @param   JTable   $table	 DataBase Table object
-	 * @param   boolean  $isNew	 If the extension is new or not
+	 * @param   string   $context  The extension
+	 * @param   JTable   $table    DataBase Table object
+	 * @param   boolean  $isNew    If the extension is new or not
 	 *
 	 * @return  void
 	 *
@@ -350,7 +351,7 @@ $this->addLogsToDb($message, $context);
 			if ($parameters)
 			{
 				$title_holder = $content->get($parameters->title_holder);
-				$type_title = $parameters->type_title;
+				$type_title   = $parameters->type_title;
 			}
 
 			$isNew_string = $isNew ? 'true' : 'false';
@@ -439,16 +440,16 @@ $this->addLogsToDb($message, $context);
 	}
 
 	/**
-  * On deleting user group data logging method
-  *
-  * Method is called after user data is deleted from the database
-  *
-  * @param   array    $group    Holds the group data
-  * @param   boolean  $success  True if user was succesfully stored in the database
-  * @param   string   $msg      Message
-  *
-  * @return  boolean
-  */
+	 * On after save user group data logging method
+	 *
+	 * Method is called after user data is deleted from the database
+	 *
+	 * @param   string   $context  The context
+	 * @param   JTable   $table    DataBase Table object
+	 * @param   boolean  $isNew    Is new or not
+	 *
+	 * @return  boolean
+	 */
 	public function onUserAfterSaveGroup($context, $table, $isNew)
 	{
 		$context = $this->app->input->get('option');
@@ -682,13 +683,17 @@ $this->addLogsToDb($message, $context);
 	/**
 	 * Method called after event log is stored to database
 	 *
-	 * @param   array  $values  The data logged to the database
+	 * @param   array  $message   The message
+	 * @param   array  $date      The Date
+	 * @param   array  $context   The Context
+	 * @param   array  $userName  The username
+	 * @param   array  $ip        The user ip
 	 *
 	 * @return  boolean
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	public function onUserLogsAfterMessageLog($message, $date, $context, $user_name, $ip)
+	public function onUserLogsAfterMessageLog($message, $date, $context, $userName, $ip)
 	{
 		$dispatcher = JEventDispatcher::getInstance();
 		$query      = $this->db->getQuery(true);
@@ -739,7 +744,7 @@ $this->addLogsToDb($message, $context);
 						<td>' . $message . '</td>
 						<td>' . $log_date . '</td>
 						<td>' . UserlogsHelper::translateExtensionName(strtoupper(strtok($extension), '.')) . '</td>
-						<td>' . $user_name . '</td>
+						<td>' . $userName . '</td>
 						<td>' . JText::_($ip) . '</td>
 			</tr></tbody></table>';
 		$mailer = JFactory::getMailer();
