@@ -15,10 +15,8 @@ JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
 JHtml::_('formbehavior.chosen', 'select');
 
-
 $listOrder  = $this->escape($this->state->get('list.ordering'));
 $listDirn   = $this->escape($this->state->get('list.direction'));
-$dispatcher = JEventDispatcher::getInstance();
 
 JFactory::getDocument()->addScriptDeclaration('
 	Joomla.submitbutton = function(task)
@@ -90,7 +88,7 @@ JFactory::getDocument()->addScriptDeclaration('
 								<?php echo JHtml::_('grid.id', $i, $item->id); ?>
 							</td>
 							<td>
-								<?php $dispatcher->trigger('onLogMessagePrepare', array (&$item->message, $item->extension)); ?>
+								<?php JEventDispatcher::getInstance()->trigger('onLogMessagePrepare', array (&$item->message, $item->extension)); ?>
 								<?php echo $this->escape($item->message); ?>
 							</td>
 							<td>

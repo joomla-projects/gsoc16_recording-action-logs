@@ -8,13 +8,14 @@
  */
 
 defined('_JEXEC') or die;
+
 JFormHelper::loadFieldClass('list');
 JLoader::register('UserlogsHelper', JPATH_COMPONENT . '/helpers/userlogs.php');
 
 /**
  * Field to load a list of all users that have logged actions
  *
- * __DEPLOY_VERSION__
+ * @since  __DEPLOY_VERSION__
  */
 class JFormFieldExtension extends JFormFieldList
 {

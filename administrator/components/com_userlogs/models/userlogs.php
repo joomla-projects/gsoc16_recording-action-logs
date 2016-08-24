@@ -159,8 +159,7 @@ class UserlogsModelUserlogs extends JModelList
 				$query = $db->getQuery(true);
 				$conditions = array($db->quoteName('log_date') . ' < DATE_SUB(NOW(), INTERVAL ' . $daysToDeleteAfter . ' DAY)');
 
-				$query->delete($db->quoteName('#__user_logs'));
-				$query->where($conditions);
+				$query->delete($db->quoteName('#__user_logs'))->where($conditions);
 				$db->setQuery($query);
 
 				$result = $db->execute();
@@ -263,11 +262,11 @@ class UserlogsModelUserlogs extends JModelList
 			{
 				$table->load($pk);
 				$items[] = (object) array(
-					'id' => $table->id,
-					'message' => $table->message,
-					'log_date' => $table->log_date,
-					'extension' => $table->extension,
-					'user_id' => $table->user_id,
+					'id'         => $table->id,
+					'message'    => $table->message,
+					'log_date'   => $table->log_date,
+					'extension'  => $table->extension,
+					'user_id'    => $table->user_id,
 					'ip_address' => $table->ip_address,
 				);
 			}

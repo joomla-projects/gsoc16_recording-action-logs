@@ -71,16 +71,12 @@ class UserlogsControllerUserlogs extends JControllerAdmin
 
 		// Get the input
 		$app = JFactory::getApplication();
-		$pks = $app->input->post->get('cid', array(), 'array');
 
 		// Sanitize the input
-		$pks = ArrayHelper::toInteger($pks);
-
-		// Get the model
-		$model = $this->getModel('userlogs');
+		$pks = ArrayHelper::toInteger($app->input->post->get('cid', array(), 'array'));
 
 		// Get the logs data
-		$data = $model->delete($pks);
+		$data = $this->getModel('userlogs')->delete($pks);
 
 		if ($data)
 		{

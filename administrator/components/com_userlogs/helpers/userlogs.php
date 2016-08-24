@@ -123,7 +123,7 @@ abstract class UserlogsHelper
 	public static function getDataByPks($pks, $field, $tableType, $tablePrefix = 'JTable')
 	{
 		$items = array();
-		$table = JTable::getInstance($tableType, $tablePrefi);
+		$table = JTable::getInstance($tableType, $tablePrefix);
 
 		foreach ($pks as $pk)
 		{
