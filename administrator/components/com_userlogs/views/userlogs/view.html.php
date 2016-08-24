@@ -1,10 +1,10 @@
 <?php
 /**
- * @package     Joomla.Administrator
+ * @package	 Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @license	 GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -16,75 +16,77 @@ defined('_JEXEC') or die;
  */
 class UserlogsViewUserlogs extends JViewLegacy
 {
-    /**
-	 * An array of items
+	/**
+	 * An array of items.
 	 *
 	 * @var  array
-     *
-     * @since 3.6
+	 *
+	 * @since 3.6
 	 */
 	protected $items;
 
-    protected $state;
+	protected $state;
 
-    protected $pagination;
+	protected $pagination;
 
-    public $activeFilters;
+	public $activeFilters;
 
-    /**
-     * Method to display the view.
-     *
-     * @param   string  $tpl  A template file to load. [optional]
-     *
-     * @return  void
-     *
-     * @since   3.6
-     */
-    public function display($tpl = null)
-    {
-        if (!JFactory::getUser()->authorise('core.viewlogs', 'com_userlogs'))
+	/**
+	 * Method to display the view.
+	 *
+	 * @param   string  $tpl  A template file to load. [optional]
+	 *
+	 * @return  void
+	 *
+	 * @since   3.6
+	 */
+	public function display($tpl = null)
+	{
+		if (!JFactory::getUser()->authorise('core.viewlogs', 'com_userlogs'))
 		{
 			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 		}
 
-        $this->items         = $this->get('Items');
-        $this->state         = $this->get('State');
-        $this->filterForm    = $this->get('FilterForm');
-        $this->activeFilters = $this->get('ActiveFilters');
-        $this->pagination    = $this->get('Pagination');
+		$this->items		 = $this->get('Items');
+		$this->state		 = $this->get('State');
+		$this->filterForm	= $this->get('FilterForm');
+		$this->activeFilters = $this->get('ActiveFilters');
+		$this->pagination	= $this->get('Pagination');
 
-        if (count($errors = $this->get('Errors')))
+		if (count($errors = $this->get('Errors')))
 		{
 			JError::raiseError(500, implode("\n", $errors));
+
 			return false;
 		}
-        $this->addToolBar();
 
-        parent::display($tpl);
-    }
+		$this->addToolBar();
 
-    /**
-     * Add the page title and toolbar.
-     *
-     * @return  void
-     *
-     * @since   3.6
-     */
-    protected function addToolbar()
-    {
-        JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
+		parent::display($tpl);
+	}
 
-        if (JFactory::getUser()->authorise('core.delete', 'com_userlogs'))
-        {
-            JToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'userlogs.delete');
-        }
+	/**
+	 * Add the page title and toolbar.
+	 *
+	 * @return  void
+	 *
+	 * @since   3.6
+	 */
+	protected function addToolbar()
+	{
+		JToolbarHelper::title(JText::_('COM_USERLOGS_MANAGER_USERLOGS'));
 
-        if (JFactory::getUser()->authorise('core.admin', 'com_userlogs') || JFactory::getUser()->authorise('core.options', 'com_userlogs'))
-        {
-            JToolbarHelper::preferences('com_userlogs');
-        }
+		if (JFactory::getUser()->authorise('core.delete', 'com_userlogs'))
+		{
+			JToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'userlogs.delete');
+		}
 
-        JToolBarHelper::custom('userlogs.exportSelectedLogs', 'download', '', 'COM_USERLOGS_EXPORT_CSV', true);
-        JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'COM_USERLOGS_EXPORT_ALL_CSV', false);
-    }
+		if (JFactory::getUser()->authorise('core.admin', 'com_userlogs') || JFactory::getUser()->authorise('core.options', 'com_userlogs'))
+		{
+			JToolbarHelper::preferences('com_userlogs');
+		}
+
+		JToolBarHelper::custom('userlogs.exportSelectedLogs', 'download', '', 'COM_USERLOGS_EXPORT_CSV', true);
+		JToolBarHelper::custom('userlogs.exportLogs', 'download', '', 'COM_USERLOGS_EXPORT_ALL_CSV', false);
+	}
 }

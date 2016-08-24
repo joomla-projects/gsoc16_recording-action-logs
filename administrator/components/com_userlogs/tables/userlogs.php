@@ -16,12 +16,12 @@ defined('_JEXEC') or die;
  */
 class JTableUserlogs extends JTable
 {
-    /**
+	/**
 	 * Constructor
 	 *
 	 * @param   JDatabaseDriver  &$db  A database connector object
-     *
-     * @since 3.6
+	 *
+	 * @since 3.6
 	 */
 	function __construct(&$db)
 	{
