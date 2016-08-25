@@ -162,7 +162,16 @@ class UserlogsModelUserlogs extends JModelList
 				$query->delete($db->quoteName('#__user_logs'))->where($conditions);
 				$db->setQuery($query);
 
-				$result = $db->execute();
+				try
+				{
+					$db->execute();
+				}
+				catch (RuntimeException $e)
+				{
+					JError::raiseWarning(500, $db->getMessage());
+
+					return false;
+				}
 			}
 		}
 	}

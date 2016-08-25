@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
  *
  * @since  __DEPLOY_VERSION__
  */
-abstract class UserlogsHelper
+class UserlogsHelper
 {
 	/**
 	 * Method to extract data array of objects into CSV file
