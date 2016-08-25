@@ -737,8 +737,8 @@ class PlgSystemUserLogs extends JPlugin
 
 			if (!JFactory::getUser()->authorise('core.viewlogs'))
 			{
-				$form->removeField('newsletter_option');
-				$form->removeField('newsletter_extensions');
+				$form->removeField('logs_notification_option');
+				$form->removeField('logs_notification_extensions');
 			}
 		}
 	}
