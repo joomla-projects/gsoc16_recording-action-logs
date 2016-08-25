@@ -19,14 +19,6 @@ JLoader::register('UserlogsHelper', JPATH_ADMINISTRATOR . '/components/com_userl
 class PlgSystemUserLogs extends JPlugin
 {
 	/**
-	 * Load the language file on instantiation.
-	 *
-	 * @var    boolean
-	 * @since  __DEPLOY_VERSION__
-	 */
-	protected $autoloadLanguage = true;
-
-	/**
 	 * Array of loggable extensions.
 	 *
 	 * @var    array
