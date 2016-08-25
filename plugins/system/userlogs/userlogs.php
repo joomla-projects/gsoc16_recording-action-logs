@@ -61,13 +61,13 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		parent::__construct($subject, $config);
 
-		if (is_array($this->params->get('loggableExtensions')))
+		if (is_array($this->params->get('loggable_extensions')))
 		{
-			$this->loggableExtensions = $this->params->get('loggableExtensions');
+			$this->loggableExtensions = $this->params->get('loggable_extensions');
 		}
 		else
 		{
-			$this->loggableExtensions = explode(',', $this->params->get('loggableExtensions'));
+			$this->loggableExtensions = explode(',', $this->params->get('loggable_extensions'));
 		}
 	}
 
