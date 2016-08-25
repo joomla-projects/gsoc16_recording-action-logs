@@ -98,6 +98,8 @@ class PlgSystemUserLogs extends JPlugin
 			$ip = JText::_('PLG_SYSTEM_USERLOG_DISABLED');
 		}
 
+		$json_message = json_encode($message);
+
 		$columns = array(
 			'message',
 			'log_date',
@@ -107,7 +109,7 @@ class PlgSystemUserLogs extends JPlugin
 		);
 
 		$values = array(
-			$this->db->quote($message),
+			$this->db->quote($json_message),
 			$this->db->quote($date),
 			$this->db->quote($context),
 			$this->db->quote($user->id),
@@ -121,7 +123,7 @@ class PlgSystemUserLogs extends JPlugin
 		$this->db->setQuery($query);
 		$this->db->execute();
 
-		$dispatcher->trigger('onUserLogsAfterMessageLog', array ($message, $date, $context, $user->name, $ip));
+		$dispatcher->trigger('onUserLogsAfterMessageLog', array ($json_message, $date, $context, $user->name, $ip));
 	}
 
 	/**
@@ -159,27 +161,30 @@ class PlgSystemUserLogs extends JPlugin
 	 */
 	public function onContentAfterSave($context, $content, $isNew)
 	{
-		if ($this->checkLoggable($this->app->input->get('option')))
+		if (!$this->checkLoggable($this->app->input->get('option')))
 		{
-			$isNew_string = $isNew ? 'true' : 'false';
-			$parameters   = UserlogsHelper::getLogMessageParams($context);
-			$title_holder = '';
-			$title_type   = '';
-
-			if ($parameters)
-			{
-				$title_holder = $content->get($parameters->title_holder);
-				$type_title = $parameters->type_title;
-			}
-
-			$message = '{"title":"' . $title_holder
-						. '","isNew":"' . $isNew_string
-						. '", "event":"onContentAfterSave",'
-						. '"type":"' . $type_title . '"}';
-
-			$strContext = (string) $context;
-			$this->addLogsToDb($message, $strContext);
+			return;
 		}
+
+		$isNew_string = $isNew ? 'true' : 'false';
+		$parameters = UserlogsHelper::getLogMessageParams($context);
+		$title_holder = "";
+		$title_type = "";
+
+		if ($parameters)
+		{
+			$title_holder = $content->get($parameters->title_holder);
+			$type_title = $parameters->type_title;
+		}
+
+		$message = array(
+			'title' => $title_holder,
+			'isNew' => $isNew_string,
+			'event' => "onContentAfterSave",
+			'type'  => $type_title
+		);
+		$strContext = (string) $context;
+		$this->addLogsToDb($message, $strContext);
 	}
 
 	/**
@@ -196,25 +201,28 @@ class PlgSystemUserLogs extends JPlugin
 	 */
 	public function onContentAfterDelete($context, $content)
 	{
-		if ($this->checkLoggable($this->app->input->get('option')))
+		if (!$this->checkLoggable($this->app->input->get('option')))
 		{
-			$parameters   = UserlogsHelper::getLogMessageParams($context);
-			$title_holder = '';
-			$title_type   = '';
-
-			if ($parameters)
-			{
-				$title_holder = $content->get($parameters->title_holder);
-				$type_title   = $parameters->type_title;
-			}
-
-			$message = '{"title":"' . $title_holder
-						. '","event":"onContentAfterDelete",'
-						. '"type":"' . $type_title . '"}';
-
-			$strContext = (string) $context;
-			$this->addLogsToDb($message, $strContext);
+			return;
 		}
+
+		$parameters = UserlogsHelper::getLogMessageParams($context);
+		$title_holder = "";
+		$title_type = "";
+
+		if ($parameters)
+		{
+			$title_holder = $content->get($parameters->title_holder);
+			$type_title = $parameters->type_title;
+		}
+
+		$message = array(
+			'title' => $title_holder,
+			'event' => "onContentAfterDelete",
+			'type'  => $type_title
+		);
+		$strContext = (string) $context;
+		$this->addLogsToDb($message, $strContext);
 	}
 
 	/**
@@ -232,25 +240,28 @@ class PlgSystemUserLogs extends JPlugin
 	 */
 	public function onContentChangeState($context, $pks, $value)
 	{
-		if ($this->checkLoggable($this->app->input->get('option')))
+		if (!$this->checkLoggable($this->app->input->get('option')))
 		{
-			$parameters = UserlogsHelper::getLogMessageParams($context);
-			$titles     = array();
-
-			if ($parameters)
-			{
-				$table_values = json_decode($parameters->table_values, true);
-				$titles       = UserlogsHelper::getDataByPks($pks, $parameters->title_holder, $table_values['table_type'], $table_values['table_prefix']);
-			}
-
-			$message = '{"event":"onContentChangeState",'
-						. '"type":"' . $parameters->type_title . '",'
-						. '"title":"' . implode('\",\"', $titles) . '","value":'
-						. (string) $value . '}';
-
-			$strContext = (string) $context;
-			$this->addLogsToDb($message, $strContext);
+			return;
 		}
+
+		$parameters = UserlogsHelper::getLogMessageParams($context);
+		$titles = array();
+
+		if ($parameters)
+		{
+			$table_values = json_decode($parameters->table_values, true);
+			$titles = UserlogsHelper::getDataByPks($pks, $parameters->title_holder, $table_values['table_type'], $table_values['table_prefix']);
+		}
+
+		$message = array(
+			'title' => implode('\",\"', $titles),
+			'event' => "onContentChangeState",
+			'type'  => $parameters->type_title,
+			'value' => (string) $value
+		);
+		$strContext = (string) $context;
+		$this->addLogsToDb($message, $strContext);
 	}
 
 	/**
@@ -269,13 +280,17 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$message = '{"event":"onExtensionAfterInstall","extenstion_name":"' . $installer->get('manifest')->name .
-				'","extenstion_type":"' . $installer->get('manifest')->attributes()['type'] . '"}';
-
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$message = array(
+			'event' => "onExtensionAfterInstall",
+			'extenstion_name'  => $installer->get('manifest')->name,
+			'extenstion_type' => $installer->get('manifest')->attributes()['type']
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -295,12 +310,17 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$message = '{"event":"onExtensionAfterUninstall","extenstion_name":"' . $installer->get('manifest')->name
-				. '","extenstion_type":"' . $installer->get('manifest')->attributes()['type'] . '"}';
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$message = array(
+			'event' => "onExtensionAfterUninstall",
+			'extenstion_name'  => $installer->get('manifest')->name,
+			'extenstion_type' => $installer->get('manifest')->attributes()['type']
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -319,13 +339,17 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$message = '{"event":"onExtensionAfterUpdate","extenstion_name":"' . $installer->get('manifest')->name .
-				'","extenstion_type":"' . $installer->get('manifest')->attributes()['type'] . '"}';
-
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$message = array(
+			'event' => "onExtensionAfterUpdate",
+			'extenstion_name'  => $installer->get('manifest')->name,
+			'extenstion_type' => $installer->get('manifest')->attributes()['type']
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -342,25 +366,29 @@ class PlgSystemUserLogs extends JPlugin
 	 */
 	public function onExtensionAfterSave($context, $table, $isNew)
 	{
-		if ($this->checkLoggable($this->app->input->get('option')))
+		if (!$this->checkLoggable($this->app->input->get('option')))
 		{
-			$parameters   = UserlogsHelper::getLogMessageParams($context);
-			$title_holder = "";
-			$title_type   = "";
-
-			if ($parameters)
-			{
-				$title_holder = $content->get($parameters->title_holder);
-				$type_title   = $parameters->type_title;
-			}
-
-			$isNew_string = $isNew ? 'true' : 'false';
-
-			$message = '{"title":"' . $table->get($parameters->title_holder) . '","isNew":"' . $isNew_string . '", "event":"onExtensionAfterSave",' .
-				'"type":"' . $parameters->type_title . '"}';
-
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$parameters = UserlogsHelper::getLogMessageParams($context);
+		$title_holder = "";
+		$title_type = "";
+
+		if ($parameters)
+		{
+			$title_holder = $content->get($parameters->title_holder);
+			$type_title = $parameters->type_title;
+		}
+
+		$isNew_string = $isNew ? 'true' : 'false';
+		$message = array(
+			'title' => $table->get($parameters->title_holder),
+			'isNew' => $isNew_string,
+			'event' => 'onExtensionAfterSave',
+			'type'  => $parameters->type_title
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -376,13 +404,17 @@ class PlgSystemUserLogs extends JPlugin
 	 */
 	public function onExtensionAfterDelete($context, $table)
 	{
-		if ($this->checkLoggable($this->app->input->get('option')))
+		if (!$this->checkLoggable($this->app->input->get('option')))
 		{
-			$isNew_string = $isNew ? 'true' : 'false';
-			$message = '{"event":"onExtensionAfterDelete","title":"' . $table->title . '"}';
-
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$isNew_string = $isNew ? 'true' : 'false';
+		$message = array(
+			"event" => "onExtensionAfterDelete",
+			"title" => $table->title
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -404,15 +436,20 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$isNew_string = $isnew ? 'true' : 'false';
-			$success_string = $success ? 'true' : 'false';
-			$message = '{"edited_user":"' . $user["name"] . '","event":"onUserAfterSave",' .
-						'"isNew":"' . $isNew_string . '","success":"' . $success_string . '", "user_id":' . $user["id"] . '}';
-
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$isNew_string = $isnew ? 'true' : 'false';
+		$success_string = $success ? 'true' : 'false';
+		$message = array(
+			'edited_user' => $user["name"],
+			'isNew' => $isNew_string,
+			'event' => 'onUserAfterSave',
+			'user_id'  => $user["id"]
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -430,13 +467,18 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$success_string = $success ? 'true' : 'false';
-			$message = '{"deleted_user":"' . $user["name"] . '","event":"onUserAfterDelete",' .
-					'"success":"' . $success_string . '", "user_id":' . $user["id"] . '}';
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$success_string = $success ? 'true' : 'false';
+		$message = array(
+			'deleted_user' => $user["name"],
+			'event' => 'onUserAfterDelete',
+			'user_id'  => $user["id"]
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -454,13 +496,18 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$isNew_string = $isNew ? 'true' : 'false';
-			$message = '{"title":"' . $table->title . '","event":"onUserAfterSaveGroup",' .
-						'"isNew":"' . $isNew_string . '"}';
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$isNew_string = $isNew ? 'true' : 'false';
+		$message = array(
+			'title' => $table->title,
+			'isNew' => $isNew_string,
+			'event' => 'onUserAfterSaveGroup',
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
@@ -478,13 +525,19 @@ class PlgSystemUserLogs extends JPlugin
 	{
 		$context = $this->app->input->get('option');
 
-		if ($this->checkLoggable($context))
+		if (!$this->checkLoggable($context))
 		{
-			$success_string = $success ? 'true' : 'false';
-			$message = '{"deleted_group":"' . $group["title"] . '","event":"onUserAfterDeleteGroup",' .
-						'"success":"' . $success_string . '", "group_id":' . $group["id"] . '}';
-			$this->addLogsToDb($message, $context);
+			return;
 		}
+
+		$success_string = $success ? 'true' : 'false';
+		$message = array(
+			'deleted_group' => $group["title"],
+			'isNew' => $isNew_string,
+			'event' => 'onUserAfterDeleteGroup',
+			'group_id' => $group["id"]
+		);
+		$this->addLogsToDb($message, $context);
 	}
 
 	/**
