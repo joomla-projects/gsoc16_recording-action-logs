@@ -121,7 +121,17 @@ class PlgSystemUserLogs extends JPlugin
 			->values(implode(',', $values));
 
 		$this->db->setQuery($query);
-		$this->db->execute();
+
+		try
+		{
+			$this->db->execute();
+		}
+		catch (RuntimeException $e)
+		{
+			JError::raiseWarning(500, $this->db->getMessage());
+
+			return false;
+		}
 
 		$dispatcher->trigger('onUserLogsAfterMessageLog', array ($json_message, $date, $context, $user->name, $ip));
 	}
@@ -756,7 +766,17 @@ class PlgSystemUserLogs extends JPlugin
 			->where($this->db->quoteName('params') . ' LIKE ' . $this->db->quote('%"logs_notification_option":"1"%'));
 
 		$this->db->setQuery($query);
-		$this->db->execute();
+
+		try
+		{
+			$this->db->execute();
+		}
+		catch (RuntimeException $e)
+		{
+			JError::raiseWarning(500, $this->db->getMessage());
+
+			return false;
+		}
 
 		$users = $this->db->loadObjectList();
 
