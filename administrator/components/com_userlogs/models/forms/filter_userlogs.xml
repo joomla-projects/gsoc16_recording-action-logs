@@ -21,7 +21,7 @@
 			description="COM_USERLOGS_EXTENSION_FILTER_DESC"
 			onchange="this.form.submit()"
 		>
-		<option value="">COM_USERLOGS_SELECT_EXTENSION</option>
+			<option value="">COM_USERLOGS_SELECT_EXTENSION</option>
 		</field>
 		<field
 			name="dateRange"
@@ -29,7 +29,7 @@
 			label="COM_USERS_OPTION_FILTER_DATE"
 			description="COM_USERS_OPTION_FILTER_DATE"
 			onchange="this.form.submit();"
-			>
+		>
 			<option value="">COM_USERSLOGS_OPTION_FILTER_DATE</option>
 		</field>
 	</fields>
@@ -41,7 +41,7 @@
 			description="COM_USERLOGS_LIST_FULL_ORDERING_DESC"
 			onchange="this.form.submit();"
 			default="a.id DESC"
-			>
+		>
 			<option value="">JGLOBAL_SORT_BY</option>
 			<option value="a.user_id ASC">JAUTHOR_ASC</option>
 			<option value="a.user_id DESC">JAUTHOR_DESC</option>

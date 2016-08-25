@@ -1,39 +1,39 @@
 <?php
 /**
- * @package	 Joomla.Administrator
+ * @package     Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE
+ * @license     GNU General Public License version 2 or later; see LICENSE
  */
 
-defined('JPATH_PLATFORM') or die;
+defined('_JEXEC') or die;
 
 JFormHelper::loadFieldClass('predefinedlist');
 
 /**
  * Field to show a list of range dates to sort with
  *
- * @since  3.2
+ * @since  __DEPLOY_VERSION__
  */
 class JFormFieldLogsDateRange extends JFormFieldPredefinedList
 {
 	/**
 	 * The form field type.
 	 *
-	 * @var	 string
-	 * @since   3.6
+	 * @var     string
+	 * @since   __DEPLOY_VERSION__
 	 */
 	protected $type = 'logsdaterange';
 
 	/**
 	 * Available options
 	 *
-	 * @var  array
-	 * @since  3.2
+	 * @var    array
+	 * @since  __DEPLOY_VERSION__
 	 */
 	protected $predefinedOptions = array(
-		'today'	   => 'COM_USERLOGS_OPTION_RANGE_TODAY',
+		'today'       => 'COM_USERLOGS_OPTION_RANGE_TODAY',
 		'past_week'   => 'COM_USERLOGS_OPTION_RANGE_PAST_WEEK',
 		'past_1month' => 'COM_USERLOGS_OPTION_RANGE_PAST_1MONTH',
 		'past_3month' => 'COM_USERLOGS_OPTION_RANGE_PAST_3MONTH',

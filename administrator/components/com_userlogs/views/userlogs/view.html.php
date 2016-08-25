@@ -1,10 +1,10 @@
 <?php
 /**
- * @package	 Joomla.Administrator
+ * @package     Joomla.Administrator
  * @subpackage  com_userlogs
  *
  * @copyright   Copyright (C) 2005 - 2016 Open Source Matters, Inc. All rights reserved.
- * @license	 GNU General Public License version 2 or later; see LICENSE.txt
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;
@@ -12,7 +12,7 @@ defined('_JEXEC') or die;
 /**
  * View class for a list of logs.
  *
- * @since  1.6
+ * @since  __DEPLOY_VERSION__
  */
 class UserlogsViewUserlogs extends JViewLegacy
 {
@@ -21,14 +21,35 @@ class UserlogsViewUserlogs extends JViewLegacy
 	 *
 	 * @var  array
 	 *
-	 * @since 3.6
+	 * @since __DEPLOY_VERSION__
 	 */
 	protected $items;
 
+	/**
+	 * @todo Doku!
+	 *
+	 * @var  @todo Doku!
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
 	protected $state;
 
+	/**
+	 * @todo Doku!
+	 *
+	 * @var  @todo Doku!
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
 	protected $pagination;
 
+	/**
+	 * @todo Doku!
+	 *
+	 * @var  @todo Doku!
+	 *
+	 * @since __DEPLOY_VERSION__
+	 */
 	public $activeFilters;
 
 	/**
@@ -38,7 +59,7 @@ class UserlogsViewUserlogs extends JViewLegacy
 	 *
 	 * @return  void
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	public function display($tpl = null)
 	{
@@ -47,11 +68,11 @@ class UserlogsViewUserlogs extends JViewLegacy
 			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 		}
 
-		$this->items		 = $this->get('Items');
-		$this->state		 = $this->get('State');
-		$this->filterForm	= $this->get('FilterForm');
+		$this->items         = $this->get('Items');
+		$this->state         = $this->get('State');
+		$this->filterForm    = $this->get('FilterForm');
 		$this->activeFilters = $this->get('ActiveFilters');
-		$this->pagination	= $this->get('Pagination');
+		$this->pagination    = $this->get('Pagination');
 
 		if (count($errors = $this->get('Errors')))
 		{
@@ -70,7 +91,7 @@ class UserlogsViewUserlogs extends JViewLegacy
 	 *
 	 * @return  void
 	 *
-	 * @since   3.6
+	 * @since   __DEPLOY_VERSION__
 	 */
 	protected function addToolbar()
 	{
