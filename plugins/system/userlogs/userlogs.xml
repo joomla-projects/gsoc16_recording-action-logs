@@ -40,7 +40,7 @@
 					<option value="0">JNO</option>
 				</field>
 				<field
-					name="loggableExtensions"
+					name="loggable_extensions"
 					type="logtype"
 					label="PLG_SYSTEM_USERLOGS_LOG_EXTENSIONS"
 					description="PLG_SYSTEM_USERLOGS_LOG_EXTENSIONS_DESC"

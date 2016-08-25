@@ -108,7 +108,6 @@ class UserlogsControllerUserlogs extends JControllerAdmin
 
 		// Get the logs data
 		$data = $this->getModel('userlogs')->getLogsData($pks);
-		$this->setRedirect(JRoute::_('index.php?option=com_userlogs&view=userlogs', true));
 
 		// Export data to CSV file
 		UserlogsHelper::dataToCsv($data);
