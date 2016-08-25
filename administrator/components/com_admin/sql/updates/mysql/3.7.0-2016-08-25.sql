@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `#__user_logs_extensions` (
 -- --------------------------------------------------------
 
 --
--- Dumping data for table `#__utf8_conversion`
+-- Dumping data for table `#__user_logs_extensions`
 --
 
 INSERT INTO `#__user_logs_extensions` (`id`, `type_title`, `type_alias`, `title_holder`, `table_values`) VALUES
