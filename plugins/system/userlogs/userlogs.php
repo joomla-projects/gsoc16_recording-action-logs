@@ -834,6 +834,9 @@ class PlgSystemUserLogs extends JPlugin
 		$mailer->Encoding = 'base64';
 		$mailer->setBody($body);
 
-		$send = $mailer->Send();
+		if (!$mail->Send())
+		{
+			$this->app->enqueueMessage(JText::_('JERROR_SENDING_EMAIL'), 'warning');
+		}
 	}
 }
