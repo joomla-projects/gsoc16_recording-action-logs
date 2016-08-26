@@ -12,7 +12,9 @@
 	<files>
 		<filename plugin="userlogs">userlogs.php</filename>
 		<folder>models</folder>
-		<folder>profiles</folder>
+		<folder>forms</folder>
+		<folder>field</folder>
+		<folder>layouts</folder>
 	</files>
 	<languages>
 		<language tag="en-GB">en-GB.plg_system_userlogs.ini</language>
@@ -20,7 +22,7 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic" addfieldpath="/plugins/system/userlogs/models/fields">
+			<fieldset name="basic" addfieldpath="/plugins/system/userlogs/models/field">
 				<field
 					name="logDeletePeriod"
 					type="number"

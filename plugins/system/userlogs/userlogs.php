@@ -732,8 +732,8 @@ class PlgSystemUserLogs extends JPlugin
 		if ($formName == 'com_admin.profile'
 			|| $formName == 'com_users.profile')
 		{
-			JForm::addFormPath(dirname(__FILE__) . '/profiles');
-			$form->loadFile('profile', false);
+			JForm::addFormPath(dirname(__FILE__) . '/forms');
+			$form->loadFile('userlogs', false);
 
 			if (!JFactory::getUser()->authorise('core.viewlogs'))
 			{
@@ -803,23 +803,17 @@ class PlgSystemUserLogs extends JPlugin
 		}
 
 		$dispatcher->trigger('onLogMessagePrepare', array (&$message, $context));
-		$body = '<h1>'
-			. JText::_('PLG_SYSTEM_USERLOG_EMAIL_SUBJECT') .
-			'</h1><h2>'
-			. JText::_('PLG_SYSTEM_USERLOG_EMAIL_DESC') .
-			'</h2><table><thead>
-					<th>' . JText::_('COM_USERLOGS_MESSAGE') . '</th>
-					<th>' . JText::_('COM_USERLOGS_DATE') . '</th>
-					<th>' . JText::_('COM_USERLOGS_EXTENSION') . '</th>
-					<th>' . JText::_('COM_USERLOGS_USER') . '</th>
-					<th>' . JText::_('COM_USERLOGS_IP_ADDRESS') . '</th>
-				</thead><tbody><tr>
-						<td>' . $message . '</td>
-						<td>' . $log_date . '</td>
-						<td>' . UserlogsHelper::translateExtensionName(strtoupper(strtok($extension), '.')) . '</td>
-						<td>' . $userName . '</td>
-						<td>' . JText::_($ip) . '</td>
-			</tr></tbody></table>';
+		$layout = new JLayoutFile('plugins.system.userlogs.layouts.logstable', JPATH_ROOT);
+
+		$displayData = array(
+			'message' => $message,
+			'log_date' => $date,
+			'extension' => UserlogsHelper::translateExtensionName(strtoupper(strtok($extension), '.')),
+			'username' => $userName,
+			'ip' => JText::_($ip)
+		);
+
+		$body = $layout->render($displayData);
 		$mailer = JFactory::getMailer();
 
 		$sender = array(
