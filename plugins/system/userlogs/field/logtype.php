@@ -37,7 +37,7 @@ class JFormFieldLogType extends JFormFieldCheckboxes
 	public function getOptions()
 	{
 		$db = JFactory::getDbo();
-		$query = $db->getQuery(​true​)
+		$query = $db->getQuery(true)
 				->select('a.extension')
 				->from($db->quoteName('#__user_logs_extensions', 'a'));
 

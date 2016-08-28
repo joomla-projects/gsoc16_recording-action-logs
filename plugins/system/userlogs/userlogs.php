@@ -80,7 +80,7 @@ class PlgSystemUserLogs extends JPlugin
 		$user       = JFactory::getUser();
 		$date       = JFactory::getDate();
 		$dispatcher = JEventDispatcher::getInstance();
-		$query      = $this->db->getQuery(​true​);
+		$query      = $this->db->getQuery(true);
 
 		if ($this->params->get('ip_logging', 0))
 		{

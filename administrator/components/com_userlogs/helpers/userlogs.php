@@ -91,7 +91,7 @@ class UserlogsHelper
 	public static function getLogMessageParams($context)
 	{
 		$db = JFactory::getDbo();
-		$query = $db->getQuery(​true​)
+		$query = $db->getQuery(true)
 				->select('a.*')
 				->from($db->quoteName('#__user_logs_tables_data', 'a'))
 				->where($db->quoteName('a.type_alias') . ' = "' . $context . '"');
