@@ -386,7 +386,7 @@ class PlgSystemUserLogs extends JPlugin
 
 		if ($parameters)
 		{
-			$title_holder = $content->get($parameters->title_holder);
+			$title_holder = $table->get($parameters->title_holder);
 			$type_title   = $parameters->type_title;
 		}
 
@@ -693,7 +693,7 @@ class PlgSystemUserLogs extends JPlugin
 
 				if (!empty($message_to_array['title']))
 				{
-					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
+					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', UserlogsHelper::translateExtensionName($message_to_array['title']));
 				}
 
 				break;
@@ -702,7 +702,7 @@ class PlgSystemUserLogs extends JPlugin
 
 				if (!empty($message_to_array['title']))
 				{
-					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', $message_to_array['title']);
+					$message = $message . JText::sprintf('PLG_SYSTEM_USERLOG_TITLED', UserlogsHelper::translateExtensionName($message_to_array['title']));
 				}
 
 				break;
