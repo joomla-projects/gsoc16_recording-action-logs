@@ -93,7 +93,7 @@ class UserlogsHelper
 		$db = JFactory::getDbo();
 		$query = $db->getQuery(​true​)
 				->select('a.*')
-				->from($db->quoteName('#__user_logs_extensions', 'a'))
+				->from($db->quoteName('#__user_logs_tables_data', 'a'))
 				->where($db->quoteName('a.type_alias') . ' = "' . $context . '"');
 
 		$db->setQuery($query);

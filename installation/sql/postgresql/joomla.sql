@@ -1860,10 +1860,41 @@ CREATE TABLE "#__user_logs" (
   PRIMARY KEY ("id")
 );
 
---
 -- Table: #__user_logs_extensions
 --
 CREATE TABLE "#__user_logs_extensions" (
+  "id" serial NOT NULL,
+  "extension" varchar(50) NOT NULL DEFAULT '',
+  PRIMARY KEY ("id")
+);
+
+--
+-- Dumping data for table '#__user_logs_extensions'
+--
+INSERT INTO "#__user_logs_extensions" ("id", "extension") VALUES
+(1, 'com_banners'),
+(2, 'com_cache'),
+(3, 'com_categories'),
+(4, 'com_config'),
+(5, 'com_contact'),
+(6, 'com_content'),
+(7, 'com_installer'),
+(8, 'com_media'),
+(9, 'com_menus'),
+(10, 'com_messages'),
+(11, 'com_modules'),
+(12, 'com_newsfeeds'),
+(13, 'com_plugins'),
+(14, 'com_redirect'),
+(15, 'com_tags'),
+(16, 'com_templates'),
+(17, 'com_users');
+-- --------------------------------------------------------
+
+--
+-- Table: #__user_logs_tables_data
+--
+CREATE TABLE "#__user_logs_tables_data" (
   "id" serial NOT NULL,
   "type_title" varchar(255) NOT NULL DEFAULT '',
   "type_alias" varchar(255) NOT NULL DEFAULT '',
@@ -1873,9 +1904,9 @@ CREATE TABLE "#__user_logs_extensions" (
 );
 
 --
--- Dumping data for table #__user_logs_extensions
+-- Dumping data for table #__user_logs_tables_data
 --
-INSERT INTO "#__user_logs_extensions" ("id", "type_title", "type_alias", "title_holder", "table_values") VALUES
+INSERT INTO "#__user_logs_tables_data" ("id", "type_title", "type_alias", "title_holder", "table_values") VALUES
 (1, 'article', 'com_content.article', 'title' ,'{"table_type":"Content","table_prefix":"JTable"}'),
 (2, 'article', 'com_content.form', 'title' ,'{"table_type":"Content","table_prefix":"JTable"}'),
 (3, 'banner', 'com_banners.banner', 'name' ,'{"table_type":"Banner","table_prefix":"BannersTable"}'),
