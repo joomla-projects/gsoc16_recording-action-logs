@@ -10,11 +10,54 @@ CREATE TABLE [#__user_logs](
 	[ip_address] [nvarchar](30) NOT NULL DEFAULT 'PLG_SYSTEM_USERLOG_DISABLED',
 );
 
-
 /****** Object:  Table [#__user_logs_extensions] ******/
 SET QUOTED_IDENTIFIER ON;
 
 CREATE TABLE [#__user_logs_extensions](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[extension] [nvarchar](255) NOT NULL DEFAULT '',
+);
+SET IDENTITY_INSERT [#__user_logs_extensions]  ON;
+INSERT INTO [#__user_logs_extensions] ([id], [extension])
+SELECT 1, 'com_banners',
+UNION ALL
+SELECT 2, 'com_cache',
+UNION ALL
+SELECT 3, 'com_categories',
+UNION ALL
+SELECT 4, 'com_config',
+UNION ALL
+SELECT 5, 'com_contact',
+UNION ALL
+SELECT 6, 'com_content',
+UNION ALL
+SELECT 7, 'com_installer',
+UNION ALL
+SELECT 8, 'com_media',
+UNION ALL
+SELECT 9, 'com_menus',
+UNION ALL
+SELECT 10, 'com_messages',
+UNION ALL
+SELECT 11, 'com_modules',
+UNION ALL
+SELECT 12, 'com_newsfeeds',
+UNION ALL
+SELECT 13, 'com_plugins',
+UNION ALL
+SELECT 14, 'com_redirect',
+UNION ALL
+SELECT 15, 'com_tags',
+UNION ALL
+SELECT 16, 'com_templates',
+UNION ALL
+SELECT 17, 'com_users';
+
+SET IDENTITY_INSERT [#__user_logs_extensions]  OFF;
+/****** Object:  Table [#__user_logs_tables_data] ******/
+SET QUOTED_IDENTIFIER ON;
+
+CREATE TABLE [#__user_logs_tables_data](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[type_title] [nvarchar](255) NOT NULL DEFAULT '',
 	[type_alias] [nvarchar](255) NOT NULL DEFAULT '',
@@ -22,9 +65,9 @@ CREATE TABLE [#__user_logs_extensions](
 	[table_values] [nvarchar](255) NULL
 );
 
-SET IDENTITY_INSERT [#__user_logs_extensions]  ON;
+SET IDENTITY_INSERT [#__user_logs_tables_data]  ON;
 
-INSERT INTO [#__user_logs_extensions] ([id], [type_title], [type_alias], [title_holder], [table_values])
+INSERT INTO [#__user_logs_tables_data] ([id], [type_title], [type_alias], [title_holder], [table_values])
 SELECT 1, 'article', 'com_content.article', 'title' ,'{"table_type":"Content","table_prefix":"JTable"}',
 UNION ALL
 SELECT 2, 'article', 'com_content.form', 'title' ,'{"table_type":"Content","table_prefix":"JTable"}',
@@ -57,7 +100,7 @@ SELECT 15, 'contact', 'com_contact.contact', 'name', '{"table_type":"Contact","t
 UNION ALL
 SELECT 16, 'module', 'com_modules.module', 'title', '{"table_type":"Module","table_prefix":"JTable"}';
 
-SET IDENTITY_INSERT [#__user_logs_extensions]  OFF;
+SET IDENTITY_INSERT [#__user_logs_tables_data]  OFF;
 
 SET IDENTITY_INSERT [#__extensions]  ON;
 

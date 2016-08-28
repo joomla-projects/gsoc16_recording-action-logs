@@ -36,25 +36,14 @@ class JFormFieldLogType extends JFormFieldCheckboxes
 	 */
 	public function getOptions()
 	{
-		$extensions = array(
-			'com_banners',
-			'com_cache',
-			'com_categories',
-			'com_config',
-			'com_contact',
-			'com_content',
-			'com_installer',
-			'com_media',
-			'com_menus',
-			'com_messages',
-			'com_modules',
-			'com_newsfeeds',
-			'com_plugins',
-			'com_redirect',
-			'com_tags',
-			'com_templates',
-			'com_users',
-		);
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(​true​)
+				->select('a.*')
+				->from($db->quoteName('#__user_logs_extensions', 'a'));
+
+		$db->setQuery($query);
+
+		$extensions = $db->loadObjectList();
 
 		$options  = array();
 		$defaults = array();
